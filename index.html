@@ -90,8 +90,12 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 .girone-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
 .girone-teams{font-size:13px;font-weight:600}
 .girone-teams span{display:block;font-size:11px;color:var(--muted);font-weight:400}
-.girone-input{display:flex;gap:5px;margin-top:6px}
-.girone-input input{flex:1;border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:12px;background:#fafaf8}
+.girone-btns{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.btn-team{background:#fafaf8;border:1px solid var(--border);border-radius:5px;padding:4px 9px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-team:hover:not(.dis-team){border-color:var(--accent);color:var(--accent)}
+.btn-team.sel-team{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.btn-team.dis-team{opacity:.35;cursor:not-allowed}
+.girone-sel-info{font-size:10px;color:var(--green);font-weight:600;margin-top:5px}
 .gwrap{overflow-x:auto;border-radius:var(--rl);box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .gtable{border-collapse:collapse;background:var(--surface);font-size:11px;white-space:nowrap;min-width:100%}
 .gtable th{padding:6px 8px;font-size:10px;font-weight:600;color:var(--muted);background:#fafaf8;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
@@ -228,6 +232,20 @@ function submitPwd() {
 }
 
 const GIRONI_LABELS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
+const GROUPS_TEAMS = [
+  ["Messico","Sud Africa","Corea","Rep.Ceca"],
+  ["Canada","Bosnia","Qatar","Svizzera"],
+  ["Brasile","Marocco","Haiti","Scozia"],
+  ["USA","Paraguay","Australia","Turchia"],
+  ["Germania","C.Avorio","Ecuador","Curacao"],
+  ["Olanda","Giappone","Svezia","Tunisia"],
+  ["Belgio","Egitto","Iran","N.Zelanda"],
+  ["Spagna","Uruguay","Arabia","C.Verde"],
+  ["Francia","Senegal","Norvegia","Iraq"],
+  ["Argentina","Algeria","Austria","Giordania"],
+  ["Portogallo","Colombia","Uzbekistan","Dr Congo"],
+  ["Inghilterra","Croazia","Ghana","Panama"],
+];
 
 const MT1 = ["Messico-Sud Africa","Canada-Bosnia","USA-Paraguay","Brasile-Marocco","Australia-Turchia","Olanda-Giappone","Svezia-Tunisia","Belgio-Egitto","Francia-Senegal","Austria-Giordania","Inghilterra-Croazia","Ghana-Panama","Uzbekistan-Colombia"];
 const MT2 = ["Rep.Ceca-Sud Africa","Canada-Qatar","Scozia-Marocco","Turchia-Paraguay","Germania-C.Avorio","Tunisia-Giappone","Belgio-Iran","N.Zelanda-Egitto","Argentina-Austria","Norvegia-Senegal","Giordania-Algeria","Inghilterra-Ghana","Colombia-Dr Congo"];
@@ -504,14 +522,22 @@ function renderInputs() {
       </div>
     </div>`).join('');
   // Gironi input
-  document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => `
+  document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => {
+    const sel = QUAL[i] || [];
+    const teams = GROUPS_TEAMS[i];
+    return `
     <div class="girone-card">
       <div class="girone-label">Girone ${g}</div>
-      <div class="girone-input">
-        <input id="gq${i}a" placeholder="1ª" value="${QUAL[i]?QUAL[i][0]:''}" oninput="setQual(${i})">
-        <input id="gq${i}b" placeholder="2ª" value="${QUAL[i]?QUAL[i][1]:''}" oninput="setQual(${i})">
+      <div class="girone-btns">
+        ${teams.map(t => {
+          const isSel = sel.includes(t);
+          const isDis = !isSel && sel.length >= 2;
+          return `<button class="btn-team${isSel?' sel-team':''}${isDis?' dis-team':''}" onclick="toggleQual(${i},'${t}')">${t}</button>`;
+        }).join('')}
       </div>
-    </div>`).join('');
+      ${sel.length>0?`<div class="girone-sel-info">✓ ${sel.join(' + ')}</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function setR(t, idx, val) {
@@ -523,20 +549,18 @@ function setR(t, idx, val) {
   });
 }
 
-function setQual(i) {
-  if (!adminUnlocked) {
-    const qi = QUAL[i];
-    document.getElementById('gq'+i+'a').value = qi ? qi[0] : '';
-    document.getElementById('gq'+i+'b').value = qi ? qi[1] : '';
-    requireAdmin(() => {});
-    return;
-  }
-  const a = document.getElementById('gq'+i+'a').value.trim();
-  const b = document.getElementById('gq'+i+'b').value.trim();
-  QUAL[i] = (a||b) ? [a,b] : null;
-  renderRanking();
-  renderGironi();
-  updateMeta();
+function toggleQual(i, team) {
+  requireAdmin(() => {
+    if (!QUAL[i]) QUAL[i] = [];
+    const idx = QUAL[i].indexOf(team);
+    if (idx >= 0) {
+      QUAL[i].splice(idx, 1);
+      if (QUAL[i].length === 0) QUAL[i] = null;
+    } else if (QUAL[i].length < 2) {
+      QUAL[i].push(team);
+    }
+    renderAll();
+  });
 }
 
 function renderSchedine() {
