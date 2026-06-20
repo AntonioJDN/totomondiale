@@ -107,9 +107,32 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 .gptd{font-weight:700;color:var(--gold);background:#fafaf8!important;border-left:2px solid var(--border)}
 
 @media(max-width:600px){header{padding:1rem}nav button{padding:10px 10px;font-size:12px}main{padding:1rem}}
+
+/* PASSWORD MODAL */
+.pwd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
+.pwd-box{background:#fff;border-radius:12px;padding:1.8rem 2rem;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center}
+.pwd-box h2{font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+.pwd-box p{font-size:12px;color:var(--muted);margin-bottom:1.1rem}
+.pwd-box input{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:14px;outline:none;text-align:center;letter-spacing:.05em}
+.pwd-box input:focus{border-color:var(--accent)}
+.pwd-error{color:var(--accent);font-size:12px;margin-top:.5rem;display:none}
+.pwd-btn{margin-top:.9rem;width:100%;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:9px;font-size:14px;font-weight:600;cursor:pointer}
+.pwd-btn:hover{opacity:.9}
 </style>
 </head>
 <body>
+
+<!-- PASSWORD MODAL -->
+<div class="pwd-overlay" id="pwd-modal">
+  <div class="pwd-box">
+    <h2>🔒 Area riservata</h2>
+    <p>Inserisci la password per modificare i risultati</p>
+    <input type="password" id="pwd-input" placeholder="Password" onkeydown="if(event.key==='Enter')submitPwd()">
+    <div class="pwd-error" id="pwd-error">Password errata, riprova.</div>
+    <button class="pwd-btn" onclick="submitPwd()">Sblocca</button>
+  </div>
+</div>
+
 <header>
   <div class="logo">
     <img src="logo.png" alt="Totobàylon" style="height:48px;filter:brightness(0) invert(1)">
@@ -144,7 +167,7 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
-  <div class="info-bar"><span class="info-dot"></span>Clicca 1/X/2 per aggiornare · la classifica si ricalcola in tempo reale</div>
+  <div class="info-bar"><span class="info-dot"></span>🔒 Modifiche protette da password · clicca un risultato per sbloccare</div>
   <div class="input-section">
     <h3>Turno 1 <span>13/13 giocate</span></h3>
     <div class="match-inputs" id="input-t1"></div>
@@ -180,6 +203,30 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 
 <script>
 const ME = "";
+let adminUnlocked = false;
+let pendingAction = null;
+
+function requireAdmin(callback) {
+  if (adminUnlocked) { callback(); return; }
+  pendingAction = callback;
+  document.getElementById('pwd-modal').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('pwd-error').style.display = 'none';
+  setTimeout(() => document.getElementById('pwd-input').focus(), 50);
+}
+
+function submitPwd() {
+  if (document.getElementById('pwd-input').value === 'ciccio-antonio') {
+    adminUnlocked = true;
+    document.getElementById('pwd-modal').style.display = 'none';
+    if (pendingAction) { pendingAction(); pendingAction = null; }
+  } else {
+    document.getElementById('pwd-error').style.display = 'block';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+
 const GIRONI_LABELS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
 
 const MT1 = ["Messico-Sud Africa","Canada-Bosnia","USA-Paraguay","Brasile-Marocco","Australia-Turchia","Olanda-Giappone","Svezia-Tunisia","Belgio-Egitto","Francia-Senegal","Austria-Giordania","Inghilterra-Croazia","Ghana-Panama","Uzbekistan-Colombia"];
@@ -468,13 +515,22 @@ function renderInputs() {
 }
 
 function setR(t, idx, val) {
-  if(t===1) R1[idx] = R1[idx]===val?null:val;
-  else if(t===2) R2[idx] = R2[idx]===val?null:val;
-  else R3[idx] = R3[idx]===val?null:val;
-  renderAll();
+  requireAdmin(() => {
+    if(t===1) R1[idx] = R1[idx]===val?null:val;
+    else if(t===2) R2[idx] = R2[idx]===val?null:val;
+    else R3[idx] = R3[idx]===val?null:val;
+    renderAll();
+  });
 }
 
 function setQual(i) {
+  if (!adminUnlocked) {
+    const qi = QUAL[i];
+    document.getElementById('gq'+i+'a').value = qi ? qi[0] : '';
+    document.getElementById('gq'+i+'b').value = qi ? qi[1] : '';
+    requireAdmin(() => {});
+    return;
+  }
   const a = document.getElementById('gq'+i+'a').value.trim();
   const b = document.getElementById('gq'+i+'b').value.trim();
   QUAL[i] = (a||b) ? [a,b] : null;
