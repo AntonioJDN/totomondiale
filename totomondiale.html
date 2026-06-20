@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Totomondiale 2026</title>
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1a18;
+    --muted: #6b6b67;
+    --accent: #c8371a;
+    --accent-light: #fdf0ed;
+    --blue: #1a5fa8;
+    --blue-light: #eaf1fb;
+    --green: #2d7a3a;
+    --green-light: #eaf5ec;
+    --gold: #b8860b;
+    --me-bg: #fff8e1;
+    --me-border: #f0c040;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.5; }
+
+  /* HEADER */
+  header { background: var(--accent); color: #fff; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-ball { font-size: 2rem; }
+  .logo-text h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+  .logo-text p { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+  .header-meta { font-size: 12px; opacity: 0.85; text-align: right; }
+  #last-update { font-weight: 600; }
+
+  /* NAV TABS */
+  nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; gap: 0; }
+  nav button { background: none; border: none; border-bottom: 3px solid transparent; padding: 14px 18px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .15s; }
+  nav button:hover { color: var(--text); }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* LAYOUT */
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.5rem; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* CLASSIFICA */
+  .rank-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .rank-table th { padding: 10px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: #fafaf8; border-bottom: 1px solid var(--border); text-align: left; }
+  .rank-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .rank-table tr:last-child td { border-bottom: none; }
+  .rank-table tr:hover td { background: #fafaf8; }
+  .rank-table tr.me td { background: var(--me-bg); }
+  .rank-table tr.me td:first-child { border-left: 3px solid var(--me-border); }
+  .rank-num { font-weight: 700; color: var(--muted); width: 40px; }
+  .rank-name { font-weight: 500; }
+  .me-badge { display: inline-block; background: var(--me-border); color: #5a3e00; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
+  .pts-cell { font-weight: 700; font-size: 16px; color: var(--accent); }
+  .sub-pts { font-size: 12px; color: var(--muted); }
+
+  /* RISULTATI */
+  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 1.5rem 0 .75rem; }
+  .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+  .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .result-card.pending { border-style: dashed; background: #fafaf8; }
+  .result-match { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .result-score { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .result-score.pending-text { color: var(--muted); font-weight: 400; font-style: italic; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+  .tag-1 { background: var(--blue-light); color: var(--blue); }
+  .tag-X { background: var(--green-light); color: var(--green); }
+  .tag-2 { background: var(--accent-light); color: var(--accent); }
+
+  /* INSERIMENTO RISULTATI */
+  .input-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .input-section h3 { font-size: 13px; font-weight: 700; margin-bottom: 1rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .input-section h3 span { background: var(--accent); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 99px; }
+  .match-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+  .match-row { display: flex; align-items: center; gap: 8px; }
+  .match-label { font-size: 12px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .btn-group { display: flex; gap: 3px; }
+  .btn-res { width: 32px; height: 28px; border: 1px solid var(--border); border-radius: 5px; background: #fafaf8; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted); transition: all .1s; }
+  .btn-res:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-res.sel-1 { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn-res.sel-X { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn-res.sel-2 { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* SCHEDINE */
+  .schedine-wrap { overflow-x: auto; border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .schedine-table { border-collapse: collapse; background: var(--surface); font-size: 11px; white-space: nowrap; min-width: 100%; }
+  .schedine-table th { padding: 6px 6px; font-size: 10px; font-weight: 600; color: var(--muted); background: #fafaf8; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; }
+  .schedine-table th.name-col { text-align: left; min-width: 130px; padding-left: 12px; }
+  .schedine-table th.t1-header { background: var(--blue-light); color: var(--blue); }
+  .schedine-table th.t2-header { background: var(--green-light); color: var(--green); }
+  .schedine-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; }
+  .schedine-table td.name-td { text-align: left; padding-left: 12px; font-weight: 500; }
+  .schedine-table tr.me-row td { background: var(--me-bg); }
+  .schedine-table tr.me-row td.name-td { border-left: 3px solid var(--me-border); }
+  .schedine-table tr:hover td { filter: brightness(.97); }
+  .cell-ok { background: #d4edda; color: #155724; border-radius: 3px; font-weight: 700; }
+  .cell-no { background: #f8d7da; color: #721c24; border-radius: 3px; }
+  .cell-nd { color: #ccc; }
+  .pts-td { font-weight: 700; color: var(--accent); background: #fafaf8 !important; border-left: 2px solid var(--border); }
+
+  /* INFO BAR */
+  .info-bar { display: flex; align-items: center; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1.25rem; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .info-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .info-bar strong { color: var(--text); }
+
+  @media (max-width: 600px) {
+    header { padding: 1rem; }
+    nav button { padding: 12px 10px; font-size: 12px; }
+    main { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-ball">⚽</div>
+    <div class="logo-text">
+      <h1>Totomondiale 2026</h1>
+      <p>Canada · Messico · Stati Uniti</p>
+    </div>
+  </div>
+  <div class="header-meta">
+    Aggiornato: <span id="last-update">—</span><br>
+    T1: <span id="t1-done">0</span>/13 · T2: <span id="t2-done">0</span>/13
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('classifica')">🏆 Classifica</button>
+  <button onclick="showTab('inserisci')">✏️ Inserisci risultati</button>
+  <button onclick="showTab('risultati')">📋 Risultati reali</button>
+  <button onclick="showTab('schedine')">📊 Schedine</button>
+</nav>
+
+<main>
+
+<!-- CLASSIFICA -->
+<div id="tab-classifica" class="tab-content active">
+  <div class="info-bar">
+    <span class="info-dot"></span>
+    Classifica live · <strong>SSC Catena</strong> = tu · aggiorna i risultati dalla tab "Inserisci risultati"
+  </div>
+  <table class="rank-table">
+    <thead><tr>
+      <th class="rank-num">#</th>
+      <th>Nome</th>
+      <th>T1</th>
+      <th>T2</th>
+      <th>Totale</th>
+    </tr></thead>
+    <tbody id="rank-body"></tbody>
+  </table>
+</div>
+
+<!-- INSERISCI RISULTATI -->
+<div id="tab-inserisci" class="tab-content">
+  <div class="info-bar">
+    <span class="info-dot"></span>
+    Clicca 1 / X / 2 per ogni partita. La classifica si aggiorna in tempo reale.
+  </div>
+  <div class="input-section">
+    <h3>Turno 1 <span>Giornata 1 — tutte giocate</span></h3>
+    <div class="match-inputs" id="input-t1"></div>
+  </div>
+  <div class="input-section">
+    <h3>Turno 2 <span id="t2-label">4/13 giocate</span></h3>
+    <div class="match-inputs" id="input-t2"></div>
+  </div>
+</div>
+
+<!-- RISULTATI -->
+<div id="tab-risultati" class="tab-content">
+  <div class="section-title">Turno 1 — tutte e 13 giocate</div>
+  <div class="results-grid" id="res-t1"></div>
+  <div class="section-title">Turno 2 — in corso</div>
+  <div class="results-grid" id="res-t2"></div>
+</div>
+
+<!-- SCHEDINE -->
+<div id="tab-schedine" class="tab-content">
+  <div class="info-bar"><span class="info-dot"></span>Verde = giusto · Rosso = sbagliato · Grigio = non ancora giocata</div>
+  <div class="schedine-wrap">
+    <table class="schedine-table" id="schedine-table"></table>
+  </div>
+</div>
+
+</main>
+
+<script>
+const ME = "SSC Catena";
+
+const MT1 = ["Messico-Sud Africa","Canada-Bosnia","USA-Paraguay","Brasile-Marocco","Australia-Turchia","Olanda-Giappone","Svezia-Tunisia","Belgio-Egitto","Francia-Senegal","Austria-Giordania","Inghilterra-Croazia","Ghana-Panama","Uzbekistan-Colombia"];
+const MT2 = ["Rep.Ceca-Sud Africa","Canada-Qatar","Scozia-Marocco","Turchia-Paraguay","Germania-C.Avorio","Tunisia-Giappone","Belgio-Iran","N.Zelanda-Egitto","Argentina-Austria","Norvegia-Senegal","Giordania-Algeria","Inghilterra-Ghana","Colombia-Dr Congo"];
+
+// Risultati reali - modifica questi valori quando arrivano i risultati
+// "1"=vittoria prima squadra, "X"=pareggio, "2"=vittoria seconda, null=non giocata
+let R1 = ["1","X","1","X","1","X","1","X","1","1","1","1","2"];
+let R2 = ["X","1","2","2",null,null,null,null,null,null,null,null,null];
+
+const SC1 = ["Messico 2-0 Sud Africa","Canada 1-1 Bosnia","USA 4-1 Paraguay","Brasile 1-1 Marocco","Australia 2-0 Turchia","Olanda 2-2 Giappone","Svezia 5-1 Tunisia","Belgio 1-1 Egitto","Francia 3-1 Senegal","Austria 3-1 Giordania","Inghilterra 4-2 Croazia","Ghana 1-0 Panama","Colombia 3-1 Uzbekistan"];
+const SC2 = ["Cechia 1-1 Sud Africa","Canada 6-0 Qatar","Scozia 0-1 Marocco","Turchia 0-1 Paraguay",null,null,null,null,null,null,null,null,null];
+
+const S1 = [
+  {n:"Riccardo Coppola",p:["1","1","1","X","2","1","1","1","1","1","1","1","2"]},
+  {n:"Andrea Pascale",p:["1","1","1","X","2","1","X","1","1","1","X","1","2"]},
+  {n:"Sasycasty",p:["1","1","1","1","2","1","X","1","1","1","1","1","2"]},
+  {n:"Jabinomed",p:["1","1","2","1","1","1","1","1","1","2","1","1","1"]},
+  {n:"Chris",p:["1","1","1","1","2","1","X","1","1","1","1","1","2"]},
+  {n:"Emanuele Lopa",p:["1","1","1","1","2","1","X","1","1","1","1","X","2"]},
+  {n:"Felton",p:["1","1","1","1","X","1","1","1","1","1","X","1","2"]},
+  {n:"Antonio Imela",p:["1","1","1","X","2","X","1","1","1","1","X","1","2"]},
+  {n:"Orabuona",p:["1","1","1","1","2","X","X","1","1","1","1","1","2"]},
+  {n:"Luca Marino",p:["1","1","X","1","2","1","X","1","1","1","1","X","2"]},
+  {n:"lamin",p:["2","1","2","2","1","1","2","2","X","1","1","1","2"]},
+  {n:"Manicomio",p:["1","1","1","1","2","X","X","1","1","1","X","1","2"]},
+  {n:"mandi",p:["X","1","X","1","2","1","1","1","1","1","X","1","2"]},
+  {n:"andrea De Angelis",p:["1","1","1","1","X","X","X","1","1","1","X","1","2"]},
+  {n:"marco landolfi",p:["X","1","1","1","2","X","1","1","1","1","X","1","2"]},
+  {n:"sabino",p:["1","1","1","1","2","X","X","1","1","1","1","X","2"]},
+  {n:"Mariano petrucci",p:["1","1","1","1","X","1","1","1","1","1","1","1","2"]},
+  {n:"enzo e bast",p:["X","2","X","1","2","1","X","1","1","1","1","X","1"]},
+  {n:"Andrea Imela",p:["X","2","1","1","2","1","1","1","1","1","1","1","2"]},
+  {n:"Shaytan",p:["X","2","1","X","2","X","1","1","1","1","X","1","2"]},
+  {n:"rosso",p:["1","2","1","1","2","1","1","X","1","1","X","X","2"]},
+  {n:"ombrato",p:["1","2","X","1","1","2","1","2","X","X","2","X","1"]},
+  {n:"Francesco Festinese",p:["1","2","1","X","2","1","1","X","X","1","1","1","1"]},
+  {n:"Salvatore zu",p:["1","2","X","1","1","X","1","1","1","1","1","1","2"]},
+  {n:"ALEXANDER dE LVCA",p:["2","X","X","1","2","X","1","1","1","1","1","1","2"]},
+  {n:"Lucio Pascale",p:["1","X","1","X","2","1","1","1","1","X","1","1","2"]},
+  {n:"Tonin cazz e fierr",p:["1","X","1","1","2","X","1","1","1","1","X","1","2"]},
+  {n:"Raffaele Migliuolo",p:["1","X","X","1","2","1","1","1","1","1","1","1","2"]},
+  {n:"Renato Amatori",p:["1","X","X","1","2","1","2","1","1","1","1","X","1"]},
+  {n:"Michele/italo",p:["1","X","1","X","2","1","X","X","1","1","X","1","2"]},
+  {n:"Alessio Dalt",p:["1","X","X","1","2","X","X","8","1","1","1","1","2"]},
+  {n:"Gallaratesi !",p:["1","X","1","2","2","X","X","1","1","1","X","1","2"]},
+  {n:"Riccardo Rota",p:["1","X","1","X","2","X","1","X","1","1","X","1","2"]},
+  {n:"Davide milo",p:["1","X","1","1","2","1","1","1","X","1","X","1","2"]},
+  {n:"Cirillogia",p:["1","X","X","X","2","X","X","X","1","1","1","1","2"]},
+  {n:"Alexrsb",p:["X","X","1","X","2","1","X","1","1","1","X","1","2"]},
+  {n:"Fabio Esposito",p:["1","X","1","1","2","1","X","1","1","1","1","2","2"]},
+  {n:"Kvarapocul",p:["1","X","X","1","2","1","2","X","1","1","X","1","2"]},
+  {n:"Renato",p:["1","X","1","1","2","1","X","1","1","1","1","1","2"]},
+  {n:"Gaetano Oliviero",p:["X","X","X","X","2","X","X","X","1","1","X","1","1"]},
+  {n:"manuel",p:["1","X","1","X","2","1","1","1","1","1","1","1","2"]},
+  {n:"SSC Catena",p:["1","X","1","X","2","1","1","1","1","1","X","1","2"]},
+  {n:"lello montella",p:["1","X","1","X","2","X","1","X","1","1","1","X","2"]},
+  {n:"Fabrizio ops",p:["1","X","2","1","2","1","2","1","2","1","X","1","2"]},
+  {n:"pietro Festinese",p:["1","X","2","1","2","1","X","1","X","X","X","1","2"]},
+  {n:"Sant antonio abete",p:["1","X","X","1","2","1","1","1","1","1","1","X","2"]},
+  {n:"Daniele tappo",p:["1","X","1","1","2","X","X","1","1","1","X","1","2"]},
+];
+
+const S2 = [
+  {n:"Riccardo Coppola",p:["1","X","X","1","1","2","1","X","1","1","X","1","1"]},
+  {n:"ALEXANDER dE LVCA",p:["1","1","X","1","1","2","X","X","1","1","2","1","X"]},
+  {n:"Lucio Pascale",p:["1","1","2","1","1","2","1","X","1","X","X","1","1"]},
+  {n:"Andrea Pascale",p:["1","1","X","1","1","2","1","2","1","X","2","1","1"]},
+  {n:"Tonin cazz e fierr",p:["1","1","X","1","1","X","1","X","1","1","2","1","1"]},
+  {n:"Raffaele Migliuolo",p:["1","1","2","1","X","2","","2","1","1","2","1","1"]},
+  {n:"Sasycasty",p:["1","1","X","1","1","2","1","X","1","1","X","1","1"]},
+  {n:"Renato Amatori",p:["1","1","1","1","1","X","1","X","1","1","2","1","1"]},
+  {n:"Michele/italo",p:["2","1","2","X","X","2","1","2","1","1","2","1","1"]},
+  {n:"Alessio Dalt",p:["1","1","X","1","1","2","1","2","1","1","2","X","1"]},
+  {n:"enzo e bast",p:["1","X","1","1","1","2","1","2","1","1","2","1","X"]},
+  {n:"Jabinomed",p:["1","1","X","1","1","2","1","2","1","1","1","1","1"]},
+  {n:"Chris",p:["1","1","2","1","1","2","1","2","X","1","2","1","1"]},
+  {n:"Emanuele Lopa",p:["1","1","X","1","X","X","1","2","1","1","2","1","1"]},
+  {n:"Felton",p:["1","1","X","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Gallaratesi !",p:["1","1","2","1","1","2","1","X","1","1","X","1","1"]},
+  {n:"Riccardo Rota",p:["1","1","2","1","1","2","1","2","1","X","2","1","1"]},
+  {n:"Andrea Imela",p:["1","1","X","1","1","2","1","2","1","1","2","X","1"]},
+  {n:"Shaytan",p:["1","1","2","1","X","2","1","2","1","1","2","1","X"]},
+  {n:"Antonio Imela",p:["1","1","X","1","X","2","1","2","1","1","2","1","1"]},
+  {n:"Orabuona",p:["X","1","2","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Davide milo",p:["1","X","X","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Cirillogia",p:["X","1","X","1","1","X","1","2","1","1","2","1","X"]},
+  {n:"Alexrsb",p:["1","1","X","1","1","2","1","X","1","1","2","1","1"]},
+  {n:"Fabio Esposito",p:["X","1","2","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Kvarapocul",p:["1","1","2","1","1","2","1","2","1","1","X","1","1"]},
+  {n:"Renato Leone",p:["1","1","2","1","X","2","1","2","1","1","2","1","1"]},
+  {n:"Gaetano Oliviero",p:["1","1","2","1","1","2","1","2","X","1","2","X","1"]},
+  {n:"Luca Marino",p:["X","1","2","X","1","2","1","2","1","1","X","1","1"]},
+  {n:"manuel",p:["1","X","2","X","1","2","1","2","1","1","X","1","1"]},
+  {n:"rosso",p:["1","1","X","1","1","2","1","2","X","1","2","1","1"]},
+  {n:"lamin",p:["1","X","1","X","X","2","1","2","1","1","2","2","X"]},
+  {n:"ombrato",p:["1","2","X","1","1","2","1","2","X","X","2","X","1"]},
+  {n:"SSC Catena",p:["1","1","2","X","1","2","1","2","1","1","X","1","X"]},
+  {n:"Manicomio",p:["X","1","2","X","1","2","1","2","1","1","2","1","1"]},
+  {n:"lello montella",p:["1","1","X","1","1","2","1","2","1","X","2","1","1"]},
+  {n:"mandi",p:["X","1","2","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"andrea De Angelis",p:["X","1","1","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"marco landolfi",p:["1","1","2","X","1","2","1","2","1","1","2","1","1"]},
+  {n:"Fabrizio ops",p:["1","X","2","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"pietro Festinese",p:["1","X","2","1","1","2","1","2","1","1","X","1","1"]},
+  {n:"Francesco Festinese",p:["1","1","X","1","X","2","1","2","1","1","2","1","1"]},
+  {n:"sabino",p:["1","1","X","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Sant antonio abete",p:["1","1","X","X","1","2","1","2","X","1","2","1","1"]},
+  {n:"Daniele tappo",p:["1","1","X","1","1","2","1","2","1","1","2","1","1"]},
+  {n:"Mariano petrucci",p:["1","1","2","1","1","2","1","2","1","1","1","1","1"]},
+  {n:"Salvatore zu",p:["2","2","X","1","1","2","1","2","1","1","X","1","1"]},
+];
+
+// ---- LOGICA ----
+function calcPts(schedine, results) {
+  return schedine.map(s => {
+    let pts = 0;
+    results.forEach((r,i) => { if(r && s.p[i] === r) pts++; });
+    return {n: s.n, pts};
+  });
+}
+
+function buildRanking() {
+  const p1 = calcPts(S1, R1);
+  const p2 = calcPts(S2, R2);
+  const all = {};
+  p1.forEach(x => { all[x.n] = {t1: x.pts, t2: 0}; });
+  p2.forEach(x => {
+    if (!all[x.n]) all[x.n] = {t1: 0, t2: x.pts};
+    else all[x.n].t2 = x.pts;
+  });
+  return Object.entries(all)
+    .map(([n,v]) => ({n, t1: v.t1, t2: v.t2, tot: v.t1 + v.t2}))
+    .sort((a,b) => b.tot - a.tot || b.t1 - a.t1 || b.t2 - a.t2);
+}
+
+function renderAll() {
+  renderRanking();
+  renderResults();
+  renderInputs();
+  renderSchedine();
+  updateMeta();
+}
+
+function renderRanking() {
+  const sorted = buildRanking();
+  const tbody = document.getElementById('rank-body');
+  const medals = ['🥇','🥈','🥉'];
+  tbody.innerHTML = sorted.map((row, i) => `
+    <tr class="${row.n === ME ? 'me' : ''}">
+      <td class="rank-num">${i < 3 ? medals[i] : i+1}</td>
+      <td class="rank-name">${row.n}${row.n === ME ? '<span class="me-badge">TU</span>' : ''}</td>
+      <td class="sub-pts">${row.t1}</td>
+      <td class="sub-pts">${row.t2}</td>
+      <td class="pts-cell">${row.tot}</td>
+    </tr>`).join('');
+}
+
+function renderResults() {
+  document.getElementById('res-t1').innerHTML = MT1.map((m,i) => `
+    <div class="result-card">
+      <div class="result-match">${m}</div>
+      <div class="result-score">${SC1[i]} <span class="tag tag-${R1[i]}">${R1[i]}</span></div>
+    </div>`).join('');
+
+  document.getElementById('res-t2').innerHTML = MT2.map((m,i) => {
+    const r = R2[i], s = SC2[i];
+    return r
+      ? `<div class="result-card"><div class="result-match">${m}</div><div class="result-score">${s} <span class="tag tag-${r}">${r}</span></div></div>`
+      : `<div class="result-card pending"><div class="result-match">${m}</div><div class="result-score pending-text">da giocare</div></div>`;
+  }).join('');
+}
+
+function renderInputs() {
+  ['1','2'].forEach(t => {
+    const MT = t === '1' ? MT1 : MT2;
+    const R = t === '1' ? R1 : R2;
+    document.getElementById(`input-t${t}`).innerHTML = MT.map((m,i) => `
+      <div class="match-row">
+        <span class="match-label" title="${m}">${m}</span>
+        <div class="btn-group">
+          ${['1','X','2'].map(v => `<button class="btn-res ${R[i]===v?'sel-'+v:''}" onclick="setResult(${t},${i},'${v}')">${v}</button>`).join('')}
+        </div>
+      </div>`).join('');
+  });
+}
+
+function setResult(turn, idx, val) {
+  if (turn == 1) { R1[idx] = R1[idx] === val ? null : val; }
+  else { R2[idx] = R2[idx] === val ? null : val; }
+  renderAll();
+}
+
+function renderSchedine() {
+  const allNames = [...new Set([...S1.map(s=>s.n),...S2.map(s=>s.n)])].sort((a,b)=>{
+    const ranking = buildRanking();
+    const ra = ranking.findIndex(r=>r.n===a);
+    const rb = ranking.findIndex(r=>r.n===b);
+    return ra - rb;
+  });
+  const allR = [...R1,...R2];
+  const allM = [...MT1,...MT2];
+
+  let html = '<thead>';
+  html += '<tr><th class="name-col">Nome</th>';
+  MT1.forEach((_,i) => html += `<th class="t1-header" title="${MT1[i]}">T1-${i+1}</th>`);
+  MT2.forEach((_,i) => html += `<th class="t2-header" title="${MT2[i]}">T2-${i+1}</th>`);
+  html += '<th>Pt</th></tr>';
+  html += '<tr><th class="name-col" style="font-size:9px;color:#aaa">— ordinate per classifica —</th>';
+  MT1.forEach(m => html += `<th class="t1-header" style="font-size:9px;max-width:36px;overflow:hidden;text-overflow:ellipsis" title="${m}">${m.split('-')[0].substring(0,5)}</th>`);
+  MT2.forEach(m => html += `<th class="t2-header" style="font-size:9px;max-width:36px;overflow:hidden;text-overflow:ellipsis" title="${m}">${m.split('-')[0].substring(0,5)}</th>`);
+  html += '<th></th></tr></thead><tbody>';
+
+  allNames.forEach(name => {
+    const ss1 = S1.find(s=>s.n===name);
+    const ss2 = S2.find(s=>s.n===name);
+    const preds = [
+      ...(ss1 ? ss1.p : Array(13).fill('-')),
+      ...(ss2 ? ss2.p : Array(13).fill('-'))
+    ];
+    let pts = 0;
+    allR.forEach((r,i) => { if(r && preds[i]===r) pts++; });
+    html += `<tr class="${name===ME?'me-row':''}"><td class="name-td">${name}</td>`;
+    preds.forEach((p,i) => {
+      const r = allR[i];
+      const cls = !r ? 'cell-nd' : (p===r ? 'cell-ok' : 'cell-no');
+      html += `<td class="${cls}">${p||'—'}</td>`;
+    });
+    html += `<td class="pts-td">${pts}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('schedine-table').innerHTML = html;
+}
+
+function updateMeta() {
+  const d1 = R1.filter(Boolean).length;
+  const d2 = R2.filter(Boolean).length;
+  document.getElementById('t1-done').textContent = d1;
+  document.getElementById('t2-done').textContent = d2;
+  document.getElementById('t2-label').textContent = `${d2}/13 giocate`;
+  document.getElementById('last-update').textContent = new Date().toLocaleDateString('it-IT', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+renderAll();
+</script>
+</body>
+</html>
