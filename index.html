@@ -182,7 +182,6 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
   <button onclick="showTab('inserisci',this)">✏️ Risultati e statistiche</button>
   <button onclick="showTab('schedine',this)">📊 Schedine 1X2</button>
   <button onclick="showTab('gironi',this)">🌍 Gironi</button>
-  <button onclick="showTab('stats',this)">📈 Statistiche</button>
 </nav>
 
 <main>
@@ -203,7 +202,7 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
   <div class="info-bar"><span class="info-dot"></span>🔒 Modifiche protette da password · clicca un risultato per sbloccare</div>
-  <div id="dist-card"></div>
+  <div class="stats-grid" id="stats-grid" style="margin-bottom:.8rem"></div>
   <div class="input-turni">
     <div class="input-section">
       <h3>Turno 1 <span>13/13 giocate</span></h3>
@@ -231,11 +230,6 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
   <div class="swrap"><table class="stable" id="stable"></table></div>
 </div>
 
-<!-- STATISTICHE -->
-<div id="tab-stats" class="tab-content">
-  <div class="info-bar"><span class="info-dot"></span>Statistiche aggiornate in tempo reale sulle partite giocate</div>
-  <div class="stats-grid" id="stats-grid"></div>
-</div>
 
 <!-- GIRONI -->
 <div id="tab-gironi" class="tab-content">
@@ -525,31 +519,12 @@ function buildRanking() {
 function renderAll() {
   renderRanking();
   renderInputs();
-  renderDistCard();
   renderSchedine();
   renderGironi();
   renderStats();
   updateMeta();
 }
 
-function renderDistCard() {
-  const played = [...R1,...R2,...R3].filter(Boolean);
-  const tot = played.length;
-  if (tot === 0) { document.getElementById('dist-card').innerHTML = ''; return; }
-  const c1 = played.filter(r=>r==='1').length;
-  const cX = played.filter(r=>r==='X').length;
-  const c2 = played.filter(r=>r==='2').length;
-  const pct = n => tot ? Math.round(n/tot*100)+'%' : '—';
-  document.getElementById('dist-card').innerHTML = `
-  <div class="dist-inline">
-    <span class="dist-inline-title">Risultati usciti (${tot})</span>
-    <div class="dist-pill-group">
-      <div class="dist-pill"><span class="tag tag-1">1</span>${c1} <span class="dp-pct">${pct(c1)}</span></div>
-      <div class="dist-pill"><span class="tag tag-X">X</span>${cX} <span class="dp-pct">${pct(cX)}</span></div>
-      <div class="dist-pill"><span class="tag tag-2">2</span>${c2} <span class="dp-pct">${pct(c2)}</span></div>
-    </div>
-  </div>`;
-}
 
 function renderStats() {
   // --- Dati base ---
@@ -597,8 +572,9 @@ function renderStats() {
   const worst3 = matchStats.slice(-3).reverse();
 
   const matchBar = (m, cls) => {
-    const short = m.name.length>22 ? m.name.substring(0,21)+'…' : m.name;
-    return `<div class="sbar-row"><span class="sbar-lbl wide" title="${m.name}">${short}</span><div class="sbar-track"><div class="sbar-fill ${cls}" style="width:${m.pct}%"></div></div><span class="sbar-val">${m.pct}%</span></div>`;
+    const short = m.name.length>20 ? m.name.substring(0,19)+'…' : m.name;
+    const tagCls = m.res==='1'?'tag-1':m.res==='X'?'tag-X':'tag-2';
+    return `<div class="sbar-row"><span class="sbar-lbl wide" title="${m.name}">${short}</span><span class="tag ${tagCls}" style="font-size:10px;padding:1px 5px">${m.res}</span><div class="sbar-track"><div class="sbar-fill ${cls}" style="width:${m.pct}%"></div></div><span class="sbar-val">${m.pct}%</span></div>`;
   };
   const card2 = `
   <div class="stat-card">
