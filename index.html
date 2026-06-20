@@ -297,7 +297,8 @@ let R2 = ["X","1","2","2",null,null,null,null,null,null,null,null,null];
 let R3 = Array(13).fill(null);
 
 // Qualificate per girone: [squadra1, squadra2] o null
-let QUAL = Array(12).fill(null);
+const QUAL_DEFAULT = [["Messico",null],null,null,["USA",null],null,null,null,null,null,null,null,null];
+let QUAL = (() => { try { const s = localStorage.getItem('qual'); return s ? JSON.parse(s) : QUAL_DEFAULT.map(v=>v?[...v]:null); } catch(e) { return QUAL_DEFAULT.map(v=>v?[...v]:null); } })();
 
 // Schedine T1
 const S1 = [
@@ -701,6 +702,7 @@ function toggleQual(i, team) {
     } else if (QUAL[i].length < 2) {
       QUAL[i].push(team);
     }
+    try { localStorage.setItem('qual', JSON.stringify(QUAL)); } catch(e) {}
     renderAll();
   });
 }
