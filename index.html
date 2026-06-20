@@ -112,18 +112,22 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 .gptd{font-weight:700;color:var(--gold);background:#fafaf8!important;border-left:2px solid var(--border)}
 
 @media(max-width:600px){header{padding:1rem}nav button{padding:10px 10px;font-size:12px}main{padding:1rem}}
-
+  
 /* STATISTICHE */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:.8rem;background: #c8371a;padding: 10px;border-radius: 20px;border:1px solid var(--border);border-radius:var(--rl);padding:1.2rem 1.3rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:.8rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.2rem 1.3rem}
 .stat-header{display:flex;align-items:center;gap:8px;margin-bottom:.7rem}
 .stat-icon{font-size:1.4rem;line-height:1}
-.stat-name{display:flex;align-items: flex-start;gap:8px;margin-bottom:.7rem;flex-direction: column;padding-bottom: 8px;border-bottom: 1px solid var(--border);r-spacing:.08em;color:var(--muted)}
-.stat-valuefont-size: 1.4rem;line-height:1800;color:var(--text);line-height:1;margin-bottom:.25rem}
+.stat-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat-value{font-size:1.6rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:.25rem}
 .stat-sub{font-size:12px;color:var(--muted);margin-bottom:.9rem}
-.sbar-row{difont-size: 2rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:.25rem-width:52px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.sbar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.sbar-lbl{font-size:11px;min-width:52px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .sbar-lbl.wide{min-width:140px;max-width:140px}
 .sbar-track{flex:1;height:9px;background:#f0ede6;border-radius:99px;overflow:hidden;position:relative}
-.sbar-fillfont-size:11px;min-width:52px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align: left;-green)}
+.sbar-fill{height:100%;border-radius:99px;transition:width .5s}
+.sbar-fill.c1{background:var(--blue)}
+.sbar-fill.cX{background:var(--green)}
 .sbar-fill.c2{background:var(--accent)}
 .sbar-fill.cgood{background:var(--green)}
 .sbar-fill.cbad{background:var(--accent)}
