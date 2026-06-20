@@ -222,8 +222,17 @@ function requireAdmin(callback) {
   setTimeout(() => document.getElementById('pwd-input').focus(), 50);
 }
 
-function submitPwd() {
-  if (document.getElementById('pwd-input').value === 'ciccio-antonio') {
+const PWD_HASH = "d6edbd63328f9061a95a472e01dda331669d3a135bc4f2d05ba23b8a053f4219";
+
+async function hashStr(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function submitPwd() {
+  const val = document.getElementById('pwd-input').value;
+  const h = await hashStr(val);
+  if (h === PWD_HASH) {
     adminUnlocked = true;
     document.getElementById('pwd-modal').style.display = 'none';
     if (pendingAction) { pendingAction(); pendingAction = null; }
