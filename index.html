@@ -603,8 +603,8 @@ function renderSchedine() {
 }
 
 function renderGironi() {
-  const names = buildRanking().map(r=>r.n);
-  let html = '<thead><tr><th class="nc">Nome</th>';
+  const names = buildRanking().map(r=>r.n).sort((a,b)=>a.localeCompare(b,'it'));
+  let html = '<thead><tr><th style="width:32px;color:var(--muted);font-size:11px">#</th><th class="nc">Nome</th>';
   GIRONI_LABELS.forEach((g,i) => {
     const q = QUAL[i];
     const label = q && q[0] ? `${q[0]}/${q[1]||'?'}` : `Gir.${g}`;
@@ -612,14 +612,14 @@ function renderGironi() {
   });
   html += '<th>Tot</th></tr></thead><tbody>';
 
-  names.forEach(name => {
+  names.forEach((name,idx) => {
     const gp = GIRONI_PRED.find(s=>s.n===name);
     if (!gp) {
-      html += `<tr class="${name===ME?'mer':''}"><td class="ntd">${name}</td>${GIRONI_LABELS.map(()=>'<td class="gnd">—</td>').join('')}<td class="gptd">0</td></tr>`;
+      html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd">${name}</td>${GIRONI_LABELS.map(()=>'<td class="gnd">—</td>').join('')}<td class="gptd">0</td></tr>`;
       return;
     }
     let tot = 0;
-    html += `<tr class="${name===ME?'mer':''}"><td class="ntd">${name}</td>`;
+    html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd">${name}</td>`;
     gp.g.forEach((pred,i) => {
       const pts = calcGironiPts(pred, QUAL[i]);
       tot += pts;
