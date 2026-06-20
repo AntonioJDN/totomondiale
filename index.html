@@ -54,11 +54,11 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 .tag-2{background:var(--accent-light);color:var(--accent)}
 
 /* INPUT */
-.input-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.1rem;margin-bottom:.8rem}
+.input-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.1rem;margin-bottom:.8rem;}
 .input-section h3{font-size:13px;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:8px}
 .input-section h3 span{background:var(--accent);color:#fff;font-size:10px;padding:2px 7px;border-radius:99px}
-.match-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:7px}
-.match-row{display:flex;align-items:center;gap:7px}
+.match-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap: 8px;}
+.match-row{display:flex;align-items:center;gap:7px;padding: 8px;border: 2px solid #dbdbdb;border-radius: 16px;}
 .match-label{font-size:12px;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .btn-group{display:flex;gap:3px}
 .btn-res{width:30px;height:26px;border:1px solid var(--border);border-radius:5px;background:#fafaf8;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
@@ -172,17 +172,19 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
   <div class="info-bar"><span class="info-dot"></span>🔒 Modifiche protette da password · clicca un risultato per sbloccare</div>
-  <div class="input-section">
-    <h3>Turno 1 <span>13/13 giocate</span></h3>
-    <div class="match-inputs" id="input-t1"></div>
-  </div>
-  <div class="input-section">
-    <h3>Turno 2 <span id="lbl-t2">4/13 giocate</span></h3>
-    <div class="match-inputs" id="input-t2"></div>
-  </div>
-  <div class="input-section">
-    <h3>Turno 3 <span id="lbl-t3">0/13 giocate — partite da definire</span></h3>
-    <div class="match-inputs" id="input-t3"></div>
+  <div class="input-turni">
+    <div class="input-section">
+      <h3>Turno 1 <span>13/13 giocate</span></h3>
+      <div class="match-inputs" id="input-t1"></div>
+    </div>
+    <div class="input-section">
+      <h3>Turno 2 <span id="lbl-t2">4/13 giocate</span></h3>
+      <div class="match-inputs" id="input-t2"></div>
+    </div>
+    <div class="input-section">
+      <h3>Turno 3 <span id="lbl-t3">0/13 giocate — partite da definire</span></h3>
+      <div class="match-inputs" id="input-t3"></div>
+    </div>
   </div>
   <div class="input-section">
     <h3>Gironi <span id="lbl-gir">qualificate da inserire</span></h3>
