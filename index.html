@@ -113,6 +113,35 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 
 @media(max-width:600px){header{padding:1rem}nav button{padding:10px 10px;font-size:12px}main{padding:1rem}}
 
+/* STATISTICHE */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:.8rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.2rem 1.3rem}
+.stat-header{display:flex;align-items:center;gap:8px;margin-bottom:.7rem}
+.stat-icon{font-size:1.4rem;line-height:1}
+.stat-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat-value{font-size:1.6rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:.25rem}
+.stat-sub{font-size:12px;color:var(--muted);margin-bottom:.9rem}
+.sbar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.sbar-lbl{font-size:11px;min-width:52px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.sbar-lbl.wide{min-width:140px;max-width:140px}
+.sbar-track{flex:1;height:9px;background:#f0ede6;border-radius:99px;overflow:hidden;position:relative}
+.sbar-fill{height:100%;border-radius:99px;transition:width .5s}
+.sbar-fill.c1{background:var(--blue)}
+.sbar-fill.cX{background:var(--green)}
+.sbar-fill.c2{background:var(--accent)}
+.sbar-fill.cgood{background:var(--green)}
+.sbar-fill.cbad{background:var(--accent)}
+.sbar-fill.cgray{background:#bbb}
+.sbar-val{font-size:11px;min-width:34px;color:var(--muted);font-weight:600}
+.sbar-threshold{position:absolute;top:0;bottom:0;width:2px;background:#888;opacity:.5}
+.stat-note{font-size:11px;color:var(--muted);margin-top:.6rem;font-style:italic}
+.dist-inline{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.8rem 1.1rem;margin-bottom:.8rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.dist-inline-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap}
+.dist-pill-group{display:flex;gap:.5rem;flex:1;flex-wrap:wrap}
+.dist-pill{display:flex;align-items:center;gap:6px;background:#fafaf8;border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
+.dist-pill .tag{margin:0}
+.dist-pill .dp-pct{font-size:11px;font-weight:400;color:var(--muted)}
+
 /* PASSWORD MODAL */
 .pwd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
 .pwd-box{background:#fff;border-radius:12px;padding:1.8rem 2rem;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center}
@@ -150,9 +179,10 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 
 <nav>
   <button class="active" onclick="showTab('classifica',this)">🏆 Classifica</button>
-  <button onclick="showTab('inserisci',this)">✏️ Risultati</button>
+  <button onclick="showTab('inserisci',this)">✏️ Risultati e statistiche</button>
   <button onclick="showTab('schedine',this)">📊 Schedine 1X2</button>
   <button onclick="showTab('gironi',this)">🌍 Gironi</button>
+  <button onclick="showTab('stats',this)">📈 Statistiche</button>
 </nav>
 
 <main>
@@ -173,6 +203,7 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
   <div class="info-bar"><span class="info-dot"></span>🔒 Modifiche protette da password · clicca un risultato per sbloccare</div>
+  <div id="dist-card"></div>
   <div class="input-turni">
     <div class="input-section">
       <h3>Turno 1 <span>13/13 giocate</span></h3>
@@ -198,6 +229,12 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 <div id="tab-schedine" class="tab-content">
   <div class="info-bar"><span class="info-dot"></span>Verde = giusto · Rosso = sbagliato · Grigio = non giocata</div>
   <div class="swrap"><table class="stable" id="stable"></table></div>
+</div>
+
+<!-- STATISTICHE -->
+<div id="tab-stats" class="tab-content">
+  <div class="info-bar"><span class="info-dot"></span>Statistiche aggiornate in tempo reale sulle partite giocate</div>
+  <div class="stats-grid" id="stats-grid"></div>
 </div>
 
 <!-- GIRONI -->
@@ -488,9 +525,131 @@ function buildRanking() {
 function renderAll() {
   renderRanking();
   renderInputs();
+  renderDistCard();
   renderSchedine();
   renderGironi();
+  renderStats();
   updateMeta();
+}
+
+function renderDistCard() {
+  const played = [...R1,...R2,...R3].filter(Boolean);
+  const tot = played.length;
+  if (tot === 0) { document.getElementById('dist-card').innerHTML = ''; return; }
+  const c1 = played.filter(r=>r==='1').length;
+  const cX = played.filter(r=>r==='X').length;
+  const c2 = played.filter(r=>r==='2').length;
+  const pct = n => tot ? Math.round(n/tot*100)+'%' : '—';
+  document.getElementById('dist-card').innerHTML = `
+  <div class="dist-inline">
+    <span class="dist-inline-title">Risultati usciti (${tot})</span>
+    <div class="dist-pill-group">
+      <div class="dist-pill"><span class="tag tag-1">1</span>${c1} <span class="dp-pct">${pct(c1)}</span></div>
+      <div class="dist-pill"><span class="tag tag-X">X</span>${cX} <span class="dp-pct">${pct(cX)}</span></div>
+      <div class="dist-pill"><span class="tag tag-2">2</span>${c2} <span class="dp-pct">${pct(c2)}</span></div>
+    </div>
+  </div>`;
+}
+
+function renderStats() {
+  // --- Dati base ---
+  const allR = [...R1,...R2,...R3];
+  const played = allR.filter(Boolean);
+  const tot = played.length;
+  if (tot === 0) {
+    document.getElementById('stats-grid').innerHTML = '<p style="color:var(--muted);font-size:13px">Nessuna partita giocata ancora.</p>';
+    return;
+  }
+
+  // --- Card 1: distribuzione 1/X/2 ---
+  const c1 = played.filter(r=>r==='1').length;
+  const cX = played.filter(r=>r==='X').length;
+  const c2 = played.filter(r=>r==='2').length;
+  const p1 = Math.round(c1/tot*100);
+  const pX = Math.round(cX/tot*100);
+  const p2 = Math.round(c2/tot*100);
+  const dominant = c1>=cX&&c1>=c2?'Vittorie casa (1)':cX>=c1&&cX>=c2?'Pareggi (X)':'Vittorie ospite (2)';
+  const card1 = `
+  <div class="stat-card">
+    <div class="stat-header"><span class="stat-icon">📊</span><span class="stat-name">Distribuzione risultati</span></div>
+    <div class="stat-value">${tot} partite</div>
+    <div class="stat-sub">risultati reali usciti su ${R1.length+R2.length+R3.length} totali · ${dominant} dominanti</div>
+    <div class="sbar-row"><span class="sbar-lbl">1</span><div class="sbar-track"><div class="sbar-fill c1" style="width:${p1}%"></div></div><span class="sbar-val">${c1} (${p1}%)</span></div>
+    <div class="sbar-row"><span class="sbar-lbl">X</span><div class="sbar-track"><div class="sbar-fill cX" style="width:${pX}%"></div></div><span class="sbar-val">${cX} (${pX}%)</span></div>
+    <div class="sbar-row"><span class="sbar-lbl">2</span><div class="sbar-track"><div class="sbar-fill c2" style="width:${p2}%"></div></div><span class="sbar-val">${c2} (${p2}%)</span></div>
+  </div>`;
+
+  // --- Card 2: partita più/meno indovinata ---
+  const matchStats = [];
+  const pushMatch = (res, pred, name) => {
+    if (!res) return;
+    const correct = pred.filter(p=>p===res).length;
+    const n = pred.length;
+    const pct = Math.round(correct/n*100);
+    matchStats.push({name, correct, n, pct, res});
+  };
+  R1.forEach((r,i) => pushMatch(r, S1.map(s=>s.p[i]), MT1[i]));
+  R2.forEach((r,i) => pushMatch(r, S2.map(s=>s.p[i]), MT2[i]));
+
+  matchStats.sort((a,b)=>b.pct-a.pct);
+  const maxPct = matchStats[0].pct;
+  const best3 = matchStats.slice(0,3);
+  const worst3 = matchStats.slice(-3).reverse();
+
+  const matchBar = (m, cls) => {
+    const short = m.name.length>22 ? m.name.substring(0,21)+'…' : m.name;
+    return `<div class="sbar-row"><span class="sbar-lbl wide" title="${m.name}">${short}</span><div class="sbar-track"><div class="sbar-fill ${cls}" style="width:${m.pct}%"></div></div><span class="sbar-val">${m.pct}%</span></div>`;
+  };
+  const card2 = `
+  <div class="stat-card">
+    <div class="stat-header"><span class="stat-icon">🎯</span><span class="stat-name">Partita più / meno indovinata</span></div>
+    <div class="stat-value">${maxPct}%</div>
+    <div class="stat-sub">record di pronostici corretti · ${matchStats[matchStats.length-1].pct}% il minimo</div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:4px">🏆 Più indovinate</div>
+    ${best3.map(m=>matchBar(m,'cgood')).join('')}
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:.7rem 0 4px">💥 Meno indovinate</div>
+    ${worst3.map(m=>matchBar(m,'cbad')).join('')}
+  </div>`;
+
+  // --- Card 3: sotto il caso (33%) ---
+  const threshold = 33;
+  const completed1 = R1.filter(Boolean).length;
+  const completed2 = R2.filter(Boolean).length;
+  const allNames = [...new Set([...S1.map(s=>s.n),...S2.map(s=>s.n)])];
+  const partStats = allNames.map(name => {
+    let ok = 0, played = 0;
+    const s1 = S1.find(s=>s.n===name);
+    const s2 = S2.find(s=>s.n===name);
+    R1.forEach((r,i)=>{ if(r){played++;if(s1&&s1.p[i]===r)ok++;} });
+    R2.forEach((r,i)=>{ if(r){played++;if(s2&&s2.p[i]===r)ok++;} });
+    return {name, ok, played, pct: played?Math.round(ok/played*100):0};
+  }).filter(p=>p.played>0);
+
+  const belowRandom = partStats.filter(p=>p.pct<threshold).sort((a,b)=>a.pct-b.pct);
+  const thPx = threshold; // threshold % per sbar-track width reference
+  const personBar = p => {
+    const short = p.name.length>22 ? p.name.substring(0,21)+'…' : p.name;
+    return `<div class="sbar-row">
+      <span class="sbar-lbl wide" title="${p.name}">${short}</span>
+      <div class="sbar-track">
+        <div class="sbar-fill cgray" style="width:${p.pct}%"></div>
+        <div class="sbar-threshold" style="left:${thPx}%"></div>
+      </div>
+      <span class="sbar-val">${p.pct}%</span>
+    </div>`;
+  };
+  const card3 = `
+  <div class="stat-card">
+    <div class="stat-header"><span class="stat-icon">😬</span><span class="stat-name">Male male</span></div>
+    <div class="stat-value">${belowRandom.length}</div>
+    <div class="stat-sub">partecipanti sotto il ${threshold}% — peggio di tirare a caso su ${partStats.length} totali</div>
+    ${belowRandom.length===0
+      ? '<div style="font-size:12px;color:var(--green);font-weight:600">🎉 Tutti sopra la soglia del caso!</div>'
+      : belowRandom.map(personBar).join('')}
+    <div class="stat-note">La barra grigia indica il limite del 33% (1 su 3 a caso)</div>
+  </div>`;
+
+  document.getElementById('stats-grid').innerHTML = card1 + card2 + card3;
 }
 
 function renderRanking() {
