@@ -99,11 +99,14 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .gtable td.ntd{text-align:left;padding-left:10px;font-weight:500}
 .gtable tr.mer td{background:var(--me-bg)}
 .gtable tr.mer td.ntd{border-left:3px solid var(--me-border)}
-.gok2{background:#d4edda;color:#155724;border-radius:2px;font-weight:700}
-.gok1{background:#fff3cd;color:#856404;border-radius:2px}
-.gno{background:#f8d7da;color:#721c24;border-radius:2px}
+.gok2{background:#d4edda;border-radius:2px}
+.gok1{background:#fff3cd;border-radius:2px}
+.gno{background:#f8d7da;border-radius:2px}
 .gnd{color:#ccc}
 .gptd{font-weight:700;color:var(--gold);background:#fafaf8!important;border-left:2px solid var(--border)}
+.gt-ok{font-weight:700;color:#166534;line-height:1.4}
+.gt-no{color:#b0b8c1;text-decoration:line-through;font-weight:400;line-height:1.4}
+.gt-nd{color:#bbb;line-height:1.4}
 
 @media(max-width:600px){
 header{

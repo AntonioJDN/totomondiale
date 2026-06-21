@@ -631,8 +631,16 @@ function renderGironi() {
       const pts = calcGironiPts(pred, QUAL[i]);
       tot += pts;
       const cls = !QUAL[i]||!QUAL[i][0] ? 'gnd' : (pts===3?'gok2':pts===1?'gok1':'gno');
-      const short = pred.split(' ').map(w=>w.substring(0,5)).join('/');
-      html += `<td class="${cls}" title="${pred}">${short}</td>`;
+      const qual = QUAL[i];
+      const teamLines = pred.split(' ').map(t => {
+        const tl = t.toLowerCase().trim();
+        let tcls = 'gt-nd';
+        if (qual && qual[0]) {
+          tcls = qual.some(q => q && q.toLowerCase().trim() === tl) ? 'gt-ok' : 'gt-no';
+        }
+        return `<div class="${tcls}" title="${t}">${t.substring(0,7)}</div>`;
+      }).join('');
+      html += `<td class="${cls}" title="${pred}">${teamLines}</td>`;
     });
     html += `<td class="gptd">${tot}</td></tr>`;
   });
