@@ -99,7 +99,10 @@ def fetch_matches():
 
 
 def build_lookup(data):
-    """Costruisce dizionario {Casa-Ospite: {result, score_str}} dai dati API."""
+    """Costruisce dizionario {Casa-Ospite: {result, score_str}} dai dati API.
+    Indicizza entrambi gli ordini (Casa-Ospite e Ospite-Casa) per resistere
+    a discrepanze home/away rispetto ai nomi hardcoded in MT1/MT2.
+    """
     lookup = {}
     for m in data.get('matches', []):
         home_api = m['homeTeam']['name']
@@ -111,17 +114,22 @@ def build_lookup(data):
         hs = score.get('home')
         as_ = score.get('away')
 
-        key = f"{home_it}-{away_it}"
         if status == 'FINISHED' and hs is not None and as_ is not None:
             if hs > as_:
-                result = '1'
+                result_fwd, result_rev = '1', '2'
             elif hs == as_:
-                result = 'X'
+                result_fwd = result_rev = 'X'
             else:
-                result = '2'
-            lookup[key] = {
-                'result': result,
+                result_fwd, result_rev = '2', '1'
+            # Chiave normale (home-away API)
+            lookup[f"{home_it}-{away_it}"] = {
+                'result': result_fwd,
                 'score': f"{hs}-{as_}"
+            }
+            # Chiave invertita (away-home) — result e score vengono adattati
+            lookup[f"{away_it}-{home_it}"] = {
+                'result': result_rev,
+                'score': f"{as_}-{hs}"
             }
     return lookup
 
@@ -204,7 +212,8 @@ if __name__ == '__main__':
 
     print("Fetching risultati da football-data.org...")
     data = fetch_matches()
-    print(f"Partite ricevute: {data.get('count', '?')}")
+    n_matches = len(data.get('matches', []))
+    print(f"Partite ricevute: {n_matches}")
 
     lookup = build_lookup(data)
     print(f"Partite finite trovate nell'API: {len(lookup)}")
