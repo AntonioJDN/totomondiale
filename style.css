@@ -189,7 +189,7 @@ nav button span {
 .part-mini-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
 .part-girone-teams{display:flex;flex-direction:column;gap:3px;margin-top:4px}
 .part-team-ok{font-weight:700;font-size:12px;color:#166534;background:#dcfce7;border-radius:4px;padding:1px 5px;display:inline-block}
-.part-team-no{font-weight:600;font-size:12px;color:#991b1b;background:#fee2e2;border-radius:4px;padding:1px 5px;display:inline-block;text-decoration:line-through;opacity:.7}
+.part-team-no{font-weight:600;font-size:12px;/* color:#991b1b; *//* background:#fee2e2; */border-radius:4px;padding:1px 5px;display:inline-block;/* text-decoration:line-through; */opacity:.7}
 .part-team-nd{font-weight:600;font-size:12px;color:var(--muted);padding:1px 5px;display:inline-block}
 
 /* PASSWORD MODAL */
