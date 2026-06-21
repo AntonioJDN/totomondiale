@@ -105,7 +105,23 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .gnd{color:#ccc}
 .gptd{font-weight:700;color:var(--gold);background:#fafaf8!important;border-left:2px solid var(--border)}
 
-@media(max-width:600px){header{padding:1rem}nav button{padding:10px 10px;font-size:12px}main{padding:1rem}}
+@media(max-width:600px){
+header{
+  padding:1rem
+}
+nav button{padding:10px 10px;font-size:12px;display: flex;flex-direction: column;gap: 8px;}
+main{padding:1rem}
+nav {
+    display: flex;
+    justify-content: flex-start;
+    padding: 16px;
+    gap: 16px;
+}
+
+nav button span {
+    font-size: 2em;
+}
+}
 
 /* STATISTICHE */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:.8rem;background:var(--accent);padding:12px;border-radius:20px}
