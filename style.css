@@ -152,6 +152,35 @@ nav button span {
 .dist-pill .tag{margin:0}
 .dist-pill .dp-pct{font-size:11px;font-weight:400;color:var(--muted)}
 
+/* PARTICIPANT MODAL */
+.pname-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.pname-link:hover{color:var(--accent)}
+.part-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem}
+.part-box{background:#fff;border-radius:16px;width:100%;max-width:680px;box-shadow:0 12px 40px rgba(0,0,0,.2);margin:auto}
+.part-header{background:var(--accent);color:#fff;padding:1.2rem 1.4rem;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
+.part-header h2{font-size:1.1rem;font-weight:700}
+.part-header-meta{font-size:12px;opacity:.85;text-align:right}
+.part-close{background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;padding:0 4px}
+.part-body{padding:1.2rem 1.4rem}
+.part-section{margin-bottom:1.2rem}
+.part-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+.part-matches{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:5px}
+.part-match{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12px;border:1px solid var(--border)}
+.part-match.ok{background:#eaf5ec;border-color:#b8dfc0}
+.part-match.no{background:#fdf0ed;border-color:#f0b8ad}
+.part-match.nd{background:#fafaf8;color:var(--muted)}
+.part-match-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.part-gironi{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:5px}
+.part-girone{padding:6px 9px;border-radius:6px;font-size:12px;border:1px solid var(--border)}
+.part-girone.ok2{background:#eaf5ec;border-color:#b8dfc0}
+.part-girone.ok1{background:#fff9e6;border-color:#f0d060}
+.part-girone.no{background:#fdf0ed;border-color:#f0b8ad}
+.part-girone.nd{background:#fafaf8;color:var(--muted)}
+.part-girone-label{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.part-score-bar{display:flex;align-items:center;gap:10px;margin-bottom:.5rem}
+.part-score-val{font-size:2rem;font-weight:800;color:var(--accent);min-width:48px}
+.part-score-breakdown{font-size:12px;color:var(--muted)}
+
 /* PASSWORD MODAL */
 .pwd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
 .pwd-box{background:#fff;border-radius:12px;padding:1.8rem 2rem;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.18);text-align:center}

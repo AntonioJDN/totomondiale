@@ -9,6 +9,20 @@
 </head>
 <body>
 
+<!-- PARTICIPANT MODAL -->
+<div class="part-overlay" id="part-modal" onclick="if(event.target===this)closePartModal()">
+  <div class="part-box">
+    <div class="part-header">
+      <div>
+        <h2 id="part-name">—</h2>
+        <div class="part-header-meta" id="part-rank">—</div>
+      </div>
+      <button class="part-close" onclick="closePartModal()">✕</button>
+    </div>
+    <div class="part-body" id="part-body"></div>
+  </div>
+</div>
+
 <!-- PASSWORD MODAL -->
 <div class="pwd-overlay" id="pwd-modal">
   <div class="pwd-box">
@@ -488,7 +502,7 @@ function renderRanking() {
   document.getElementById('rank-body').innerHTML = sorted.map((r,i) => `
     <tr class="${r.n===ME?'me':''}">
       <td style="width:36px;color:var(--muted);font-weight:700">${i<3?medals[i]:i+1}</td>
-      <td style="font-weight:500">${r.n}${r.n===ME?'<span class="me-badge">TU</span>':''}</td>
+      <td style="font-weight:500"><span class="pname-link" onclick="showPartModal('${r.n}')">${r.n}</span>${r.n===ME?'<span class="me-badge">TU</span>':''}</td>
       <td class="sub-pts">${r.t1}</td>
       <td class="sub-pts">${r.t2}</td>
       <td class="sub-pts">${r.t3}</td>
@@ -583,7 +597,7 @@ function renderSchedine() {
     ];
     let pts = 0;
     allR.forEach((r,i) => { if(r && preds[i]===r) pts++; });
-    html += `<tr class="${name===ME?'mer':''}"><td class="ntd">${name}</td>`;
+    html += `<tr class="${name===ME?'mer':''}"><td class="ntd"><span class="pname-link" onclick="showPartModal('${name}')">${name}</span></td>`;
     preds.forEach((p,i) => {
       const r = allR[i];
       const cls = !r?'nd':(p===r?'ok':'no');
@@ -608,11 +622,11 @@ function renderGironi() {
   names.forEach((name,idx) => {
     const gp = GIRONI_PRED.find(s=>s.n===name);
     if (!gp) {
-      html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd">${name}</td>${GIRONI_LABELS.map(()=>'<td class="gnd">—</td>').join('')}<td class="gptd">0</td></tr>`;
+      html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd"><span class="pname-link" onclick="showPartModal('${name}')">${name}</span></td>${GIRONI_LABELS.map(()=>'<td class="gnd">—</td>').join('')}<td class="gptd">0</td></tr>`;
       return;
     }
     let tot = 0;
-    html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd">${name}</td>`;
+    html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd"><span class="pname-link" onclick="showPartModal('${name}')">${name}</span></td>`;
     gp.g.forEach((pred,i) => {
       const pts = calcGironiPts(pred, QUAL[i]);
       tot += pts;
@@ -634,6 +648,95 @@ function updateMeta() {
   const girDone = QUAL.filter(q=>q&&q[0]).length;
   document.getElementById('lbl-gir').textContent = girDone+'/12 gironi inseriti';
   document.getElementById('last-update').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function showPartModal(name) {
+  const ranking = buildRanking();
+  const rankIdx = ranking.findIndex(r=>r.n===name);
+  const rank = rankIdx >= 0 ? rankIdx+1 : '?';
+  const r = ranking[rankIdx] || {t1:0,t2:0,t3:0,gir:0,tot:0};
+
+  document.getElementById('part-name').textContent = name;
+  document.getElementById('part-rank').textContent = `#${rank} in classifica · ${r.tot} punti`;
+
+  const s1 = S1.find(s=>s.n===name);
+  const s2 = S2.find(s=>s.n===name);
+  const gp = GIRONI_PRED.find(s=>s.n===name);
+
+  // Sezione schedina T1
+  const matchBlock = (MT, R, SC, S, label) => {
+    if (!S) return '';
+    const rows = MT.map((m,i) => {
+      const pred = S.p[i];
+      const res = R[i];
+      const score = SC && SC[i] ? (SC[i].match(/\d+-\d+/)||[''])[0] : '';
+      const cls = !res ? 'nd' : pred===res ? 'ok' : 'no';
+      const icon = !res ? '—' : pred===res ? '✓' : '✗';
+      const tagCls = pred==='1'?'tag-1':pred==='X'?'tag-X':'tag-2';
+      return `<div class="part-match ${cls}">
+        <span class="part-match-name" title="${m}">${m}</span>
+        ${score?`<span style="font-size:11px;color:var(--muted)">${score}</span>`:''}
+        <span class="tag ${tagCls}" style="font-size:10px;padding:1px 5px">${pred||'?'}</span>
+        <span style="font-size:11px;font-weight:700">${icon}</span>
+      </div>`;
+    }).join('');
+    return `<div class="part-section">
+      <div class="part-section-title">${label} · ${R.filter(Boolean).length}/13 giocate · ${r['t'+label[1]]} pt</div>
+      <div class="part-matches">${rows}</div>
+    </div>`;
+  };
+
+  // Sezione gironi
+  let gironiHtml = '';
+  if (gp) {
+    const cells = GIRONI_LABELS.map((g,i) => {
+      const pred = gp.g[i]; // "Squadra1 Squadra2"
+      const qual = QUAL[i];
+      let pts = 0, cls = 'nd';
+      if (qual && qual[0]) {
+        pts = calcGironiPts(pred, qual);
+        cls = pts===3?'ok2':pts===1?'ok1':'no';
+      }
+      const teams = pred.split(' ');
+      return `<div class="part-girone ${cls}">
+        <div class="part-girone-label">Girone ${g}${qual&&qual[0]?' · '+pts+' pt':' · da definire'}</div>
+        <div style="font-weight:600">${teams[0]}</div>
+        <div style="font-weight:600">${teams[1]||''}</div>
+      </div>`;
+    }).join('');
+    gironiHtml = `<div class="part-section">
+      <div class="part-section-title">Pronostici gironi · ${r.gir} pt</div>
+      <div class="part-gironi">${cells}</div>
+    </div>`;
+  }
+
+  // Accuratezza 1X2
+  let ok=0, played=0;
+  if(s1) R1.forEach((res,i)=>{if(res){played++;if(s1.p[i]===res)ok++;}});
+  if(s2) R2.forEach((res,i)=>{if(res){played++;if(s2.p[i]===res)ok++;}});
+  const pct = played ? Math.round(ok/played*100) : 0;
+
+  document.getElementById('part-body').innerHTML = `
+    <div class="part-section">
+      <div class="part-section-title">Riepilogo</div>
+      <div class="part-score-bar">
+        <div class="part-score-val">${r.tot}</div>
+        <div class="part-score-breakdown">
+          T1: ${r.t1} · T2: ${r.t2} · T3: ${r.t3} · Gironi: ${r.gir}<br>
+          Accuratezza 1X2: ${ok}/${played} (${pct}%)
+        </div>
+      </div>
+    </div>
+    ${matchBlock(MT1,R1,SC1,s1,'T1')}
+    ${matchBlock(MT2,R2,SC2,s2,'T2')}
+    ${gironiHtml}`;
+
+  const modal = document.getElementById('part-modal');
+  modal.style.display = 'flex';
+}
+
+function closePartModal() {
+  document.getElementById('part-modal').style.display = 'none';
 }
 
 function showTab(name, btn) {
