@@ -11,10 +11,10 @@ header{background:var(--accent);color:#fff;padding:1.2rem 2rem;display:flex;alig
 .logo h1{font-size:1.3rem;font-weight:700;letter-spacing:-.02em}
 .logo p{font-size:11px;opacity:.8;margin-top:1px}
 .header-meta{font-size:11px;opacity:.85;text-align:right}
-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;gap:0;overflow-x:auto}
-nav button{background:none;border:none;border-bottom:3px solid transparent;padding:12px 14px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;gap: 8px;overflow-x:auto;padding: 8px 1.5rem;justify-content: center;}
+nav button{background:none;border:none;padding: 16px;font-size: 1.2em;font-weight: 600;color:var(--muted);cursor:pointer;white-space:nowrap;background: var(--accent-light);border-radius: 20px;border: 2px solid transparent;}
 nav button:hover{color:var(--text)}
-nav button.active{color:var(--accent);border-bottom-color:var(--accent)}
+nav button.active{color:var(--accent);border: 2px solid var(--accent);}
 main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 .tab-content{display:none}
 .tab-content.active{display:block}
@@ -25,7 +25,7 @@ main{max-width:1100px;margin:0 auto;padding:1.2rem 1.5rem}
 /* CLASSIFICA */
 .rank-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .rank-table th{padding:9px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:#fafaf8;border-bottom:1px solid var(--border);text-align:left}
-.rank-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.rank-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size: 1.1em;}
 .rank-table tr:last-child td{border-bottom:none}
 .rank-table tr:hover td{background:#fafaf8}
 .rank-table tr.me td{background:var(--me-bg)}
