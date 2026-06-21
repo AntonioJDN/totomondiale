@@ -646,30 +646,20 @@ function renderRanking() {
 }
 
 function renderInputs() {
-  // T1
-  document.getElementById('input-t1').innerHTML = MT1.map((m,i) => `
+  const matchRow = (m, i, R, SC, t) => {
+    const score = SC && SC[i] ? `<span style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap">${SC[i]}</span>` : '';
+    return `
     <div class="match-row">
       <span class="match-label" title="${m}">${m}</span>
+      ${score}
       <div class="btn-group">
-        ${['1','X','2'].map(v=>`<button class="btn-res ${R1[i]===v?'sel-'+v:''}" onclick="setR(1,${i},'${v}')">${v}</button>`).join('')}
+        ${['1','X','2'].map(v=>`<button class="btn-res ${R[i]===v?'sel-'+v:''}" onclick="setR(${t},${i},'${v}')">${v}</button>`).join('')}
       </div>
-    </div>`).join('');
-  // T2
-  document.getElementById('input-t2').innerHTML = MT2.map((m,i) => `
-    <div class="match-row">
-      <span class="match-label" title="${m}">${m}</span>
-      <div class="btn-group">
-        ${['1','X','2'].map(v=>`<button class="btn-res ${R2[i]===v?'sel-'+v:''}" onclick="setR(2,${i},'${v}')">${v}</button>`).join('')}
-      </div>
-    </div>`).join('');
-  // T3
-  document.getElementById('input-t3').innerHTML = MT3.map((m,i) => `
-    <div class="match-row">
-      <span class="match-label" title="${m}">${m}</span>
-      <div class="btn-group">
-        ${['1','X','2'].map(v=>`<button class="btn-res ${R3[i]===v?'sel-'+v:''}" onclick="setR(3,${i},'${v}')">${v}</button>`).join('')}
-      </div>
-    </div>`).join('');
+    </div>`;
+  };
+  document.getElementById('input-t1').innerHTML = MT1.map((m,i) => matchRow(m,i,R1,SC1,1)).join('');
+  document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2,2)).join('');
+  document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,null,3)).join('');
   // Gironi input
   document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => {
     const sel = QUAL[i] || [];
