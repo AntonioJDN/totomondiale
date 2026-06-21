@@ -180,6 +180,17 @@ nav button span {
 .part-score-bar{display:flex;align-items:center;gap:10px;margin-bottom:.5rem}
 .part-score-val{font-size:2rem;font-weight:800;color:var(--accent);min-width:48px}
 .part-score-breakdown{font-size:12px;color:var(--muted)}
+.part-summary{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
+.part-donut-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.part-donut-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.part-mini-cards{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.part-mini-card{background:#f8f9fa;border-radius:10px;padding:8px 14px;text-align:center;min-width:52px;border:1px solid var(--border)}
+.part-mini-val{font-size:1.4rem;font-weight:800;line-height:1.1}
+.part-mini-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.part-girone-teams{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.part-team-ok{font-weight:700;font-size:12px;color:#166534;background:#dcfce7;border-radius:4px;padding:1px 5px;display:inline-block}
+.part-team-no{font-weight:600;font-size:12px;color:#991b1b;background:#fee2e2;border-radius:4px;padding:1px 5px;display:inline-block;text-decoration:line-through;opacity:.7}
+.part-team-nd{font-weight:600;font-size:12px;color:var(--muted);padding:1px 5px;display:inline-block}
 
 /* PASSWORD MODAL */
 .pwd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}

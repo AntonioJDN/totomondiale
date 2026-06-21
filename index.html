@@ -663,7 +663,44 @@ function showPartModal(name) {
   const s2 = S2.find(s=>s.n===name);
   const gp = GIRONI_PRED.find(s=>s.n===name);
 
-  // Sezione schedina T1
+  // Accuratezza 1X2
+  let ok=0, played=0;
+  if(s1) R1.forEach((res,i)=>{if(res){played++;if(s1.p[i]===res)ok++;}});
+  if(s2) R2.forEach((res,i)=>{if(res){played++;if(s2.p[i]===res)ok++;}});
+  const pct = played ? Math.round(ok/played*100) : 0;
+
+  // Donut chart SVG
+  const rad = 32, circ = 2*Math.PI*rad;
+  const dash = circ * pct / 100;
+  const donutColor = pct>=50?'#22c55e':pct>=33?'#f59e0b':'#ef4444';
+  const donut = `<svg width="90" height="90" viewBox="0 0 90 90" style="display:block">
+    <circle cx="45" cy="45" r="${rad}" fill="none" stroke="#e9ecef" stroke-width="10"/>
+    <circle cx="45" cy="45" r="${rad}" fill="none" stroke="${donutColor}" stroke-width="10"
+      stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}"
+      transform="rotate(-90 45 45)"/>
+    <text x="45" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="${donutColor}" font-family="inherit">${pct}%</text>
+    <text x="45" y="56" text-anchor="middle" font-size="9" fill="#9ca3af" font-family="inherit">${ok}/${played}</text>
+  </svg>`;
+
+  // Mini score cards
+  const miniCard = (lbl, val, col) =>
+    `<div class="part-mini-card"><div class="part-mini-val" style="color:${col}">${val}</div><div class="part-mini-lbl">${lbl}</div></div>`;
+
+  const summaryHtml = `<div class="part-section">
+    <div class="part-section-title">Riepilogo</div>
+    <div class="part-summary">
+      <div class="part-donut-wrap">${donut}<div class="part-donut-lbl">Accuratezza 1X2</div></div>
+      <div class="part-mini-cards">
+        ${miniCard('Totale', r.tot, 'var(--accent)')}
+        ${miniCard('T1', r.t1, 'var(--green)')}
+        ${miniCard('T2', r.t2, 'var(--green)')}
+        ${miniCard('T3', r.t3, 'var(--muted)')}
+        ${miniCard('Gironi', r.gir, 'var(--gold)')}
+      </div>
+    </div>
+  </div>`;
+
+  // Match block per turno
   const matchBlock = (MT, R, SC, S, label) => {
     if (!S) return '';
     const rows = MT.map((m,i) => {
@@ -686,11 +723,11 @@ function showPartModal(name) {
     </div>`;
   };
 
-  // Sezione gironi
+  // Gironi: evidenzia ogni squadra singolarmente
   let gironiHtml = '';
   if (gp) {
     const cells = GIRONI_LABELS.map((g,i) => {
-      const pred = gp.g[i]; // "Squadra1 Squadra2"
+      const pred = gp.g[i];
       const qual = QUAL[i];
       let pts = 0, cls = 'nd';
       if (qual && qual[0]) {
@@ -698,10 +735,17 @@ function showPartModal(name) {
         cls = pts===3?'ok2':pts===1?'ok1':'no';
       }
       const teams = pred.split(' ');
+      const teamTags = teams.map(t => {
+        const tl = t.toLowerCase().trim();
+        let tcls = 'part-team-nd';
+        if (qual && qual[0]) {
+          tcls = qual.some(q => q && q.toLowerCase().trim() === tl) ? 'part-team-ok' : 'part-team-no';
+        }
+        return `<span class="${tcls}">${t}</span>`;
+      }).join('');
       return `<div class="part-girone ${cls}">
         <div class="part-girone-label">Girone ${g}${qual&&qual[0]?' · '+pts+' pt':' · da definire'}</div>
-        <div style="font-weight:600">${teams[0]}</div>
-        <div style="font-weight:600">${teams[1]||''}</div>
+        <div class="part-girone-teams">${teamTags}</div>
       </div>`;
     }).join('');
     gironiHtml = `<div class="part-section">
@@ -710,29 +754,12 @@ function showPartModal(name) {
     </div>`;
   }
 
-  // Accuratezza 1X2
-  let ok=0, played=0;
-  if(s1) R1.forEach((res,i)=>{if(res){played++;if(s1.p[i]===res)ok++;}});
-  if(s2) R2.forEach((res,i)=>{if(res){played++;if(s2.p[i]===res)ok++;}});
-  const pct = played ? Math.round(ok/played*100) : 0;
+  document.getElementById('part-body').innerHTML = summaryHtml +
+    matchBlock(MT1,R1,SC1,s1,'T1') +
+    matchBlock(MT2,R2,SC2,s2,'T2') +
+    gironiHtml;
 
-  document.getElementById('part-body').innerHTML = `
-    <div class="part-section">
-      <div class="part-section-title">Riepilogo</div>
-      <div class="part-score-bar">
-        <div class="part-score-val">${r.tot}</div>
-        <div class="part-score-breakdown">
-          T1: ${r.t1} · T2: ${r.t2} · T3: ${r.t3} · Gironi: ${r.gir}<br>
-          Accuratezza 1X2: ${ok}/${played} (${pct}%)
-        </div>
-      </div>
-    </div>
-    ${matchBlock(MT1,R1,SC1,s1,'T1')}
-    ${matchBlock(MT2,R2,SC2,s2,'T2')}
-    ${gironiHtml}`;
-
-  const modal = document.getElementById('part-modal');
-  modal.style.display = 'flex';
+  document.getElementById('part-modal').style.display = 'flex';
 }
 
 function closePartModal() {
