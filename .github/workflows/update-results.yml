@@ -1,0 +1,33 @@
+name: Aggiorna risultati
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # ogni ora
+  workflow_dispatch:        # trigger manuale dal sito GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Aggiorna risultati
+        env:
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+        run: python3 update_results.py
+
+      - name: Commit se ci sono modifiche
+        run: |
+          git config user.name "Totobàylon Bot"
+          git config user.email "bot@totomondiale"
+          if git diff --quiet; then
+            echo "Nessuna modifica."
+          else
+            git add index.html
+            git commit -m "🤖 Auto-update risultati $(date +'%d/%m %H:%M')"
+            git push
+          fi
