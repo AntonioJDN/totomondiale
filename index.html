@@ -628,15 +628,18 @@ function renderGironi() {
     let tot = 0;
     html += `<tr class="${name===ME?'mer':''}"><td style="color:var(--muted);font-size:12px">${idx+1}</td><td class="ntd"><span class="pname-link" onclick="showPartModal('${name}')">${name}</span></td>`;
     gp.g.forEach((pred,i) => {
-      const pts = calcGironiPts(pred, QUAL[i]);
-      tot += pts;
-      const cls = !QUAL[i]||!QUAL[i][0] ? 'gnd' : (pts===3?'gok2':pts===1?'gok1':'gno');
       const qual = QUAL[i];
+      const bothKnown = qual && qual[0] && qual[1];
+      const pts = calcGironiPts(pred, qual);
+      tot += pts;
+      const cls = !qual||!qual[0] ? 'gnd' : pts===3 ? 'gok2' : pts===1 ? 'gok1' : bothKnown ? 'gno' : 'gnd';
       const teamLines = pred.split(' ').map(t => {
         const tl = t.toLowerCase().trim();
         let tcls = 'gt-nd';
         if (qual && qual[0]) {
-          tcls = qual.some(q => q && q.toLowerCase().trim() === tl) ? 'gt-ok' : 'gt-no';
+          const isOk = qual.some(q => q && q.toLowerCase().trim() === tl);
+          if (isOk) tcls = 'gt-ok';
+          else if (bothKnown) tcls = 'gt-no';
         }
         return `<div class="${tcls}" title="${t}">${t.substring(0,7)}</div>`;
       }).join('');
@@ -737,17 +740,20 @@ function showPartModal(name) {
     const cells = GIRONI_LABELS.map((g,i) => {
       const pred = gp.g[i];
       const qual = QUAL[i];
+      const bothKnownM = qual && qual[0] && qual[1];
       let pts = 0, cls = 'nd';
       if (qual && qual[0]) {
         pts = calcGironiPts(pred, qual);
-        cls = pts===3?'ok2':pts===1?'ok1':'no';
+        cls = pts===3 ? 'ok2' : pts===1 ? 'ok1' : bothKnownM ? 'no' : 'nd';
       }
       const teams = pred.split(' ');
       const teamTags = teams.map(t => {
         const tl = t.toLowerCase().trim();
         let tcls = 'part-team-nd';
         if (qual && qual[0]) {
-          tcls = qual.some(q => q && q.toLowerCase().trim() === tl) ? 'part-team-ok' : 'part-team-no';
+          const isOk = qual.some(q => q && q.toLowerCase().trim() === tl);
+          if (isOk) tcls = 'part-team-ok';
+          else if (bothKnownM) tcls = 'part-team-no';
         }
         return `<span class="${tcls}">${t}</span>`;
       }).join('');
