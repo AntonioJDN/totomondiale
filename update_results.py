@@ -84,7 +84,12 @@ MT2 = [
     "Argentina-Austria", "Norvegia-Senegal", "Giordania-Algeria",
     "Inghilterra-Ghana", "Colombia-Dr Congo"
 ]
-MT3 = []  # da definire
+MT3 = [
+    "Svizzera-Canada", "Bosnia-Qatar", "Sud Africa-Corea", "Rep.Ceca-Messico",
+    "Ecuador-Germania", "Tunisia-Olanda", "Giappone-Svezia", "Turchia-USA",
+    "Norvegia-Francia", "Uruguay-Spagna", "Egitto-Iran", "Colombia-Portogallo",
+    "Algeria-Austria"
+]
 
 
 def fetch_matches():
@@ -183,7 +188,7 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
     return R, SC
 
 
-def update_html(r1, sc1, r2, sc2):
+def update_html(r1, sc1, r2, sc2, r3, sc3):
     with open(INDEX_FILE, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -198,8 +203,10 @@ def update_html(r1, sc1, r2, sc2):
 
     content = replace_var(content, 'R1', r1, let=True)
     content = replace_var(content, 'R2', r2, let=True)
+    content = replace_var(content, 'R3', r3, let=True)
     content = replace_var(content, 'SC1', sc1, let=False)
     content = replace_var(content, 'SC2', sc2, let=False)
+    content = replace_var(content, 'SC3', sc3, let=False)
 
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -225,11 +232,15 @@ if __name__ == '__main__':
     existing_sc1 = parse_existing(current, 'SC1', let=False)
     existing_r2 = parse_existing(current, 'R2', let=True)
     existing_sc2 = parse_existing(current, 'SC2', let=False)
+    existing_r3 = parse_existing(current, 'R3', let=True)
+    existing_sc3 = parse_existing(current, 'SC3', let=False)
 
     print("\nT1:")
     r1, sc1 = build_arrays(MT1, lookup, existing_r1, existing_sc1)
     print("\nT2:")
     r2, sc2 = build_arrays(MT2, lookup, existing_r2, existing_sc2)
+    print("\nT3:")
+    r3, sc3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
 
-    update_html(r1, sc1, r2, sc2)
+    update_html(r1, sc1, r2, sc2, r3, sc3)
     print("\nindex.html aggiornato.")
