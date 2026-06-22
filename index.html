@@ -23,16 +23,6 @@
   </div>
 </div>
 
-<!-- PASSWORD MODAL -->
-<div class="pwd-overlay" id="pwd-modal">
-  <div class="pwd-box">
-    <h2>🔒 Area riservata</h2>
-    <p>Inserisci la password per modificare i risultati</p>
-    <input type="password" id="pwd-input" placeholder="Password" onkeydown="if(event.key==='Enter')submitPwd()">
-    <div class="pwd-error" id="pwd-error">Password errata, riprova.</div>
-    <button class="pwd-btn" onclick="submitPwd()">Sblocca</button>
-  </div>
-</div>
 
 <header>
   <div class="logo">
@@ -68,7 +58,7 @@
 
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
-  <div class="info-bar"><span class="info-dot"></span>🔒 Modifiche protette da password · clicca un risultato per sbloccare</div>
+  <div class="info-bar"><span class="info-dot"></span>Risultati aggiornati automaticamente ogni ora</div>
   <div class="stats-grid" id="stats-grid" style="margin-bottom:.8rem"></div>
   <div class="input-turni">
     <div class="input-section">
@@ -108,38 +98,6 @@
 
 <script>
 const ME = "";
-let adminUnlocked = false;
-let pendingAction = null;
-
-function requireAdmin(callback) {
-  if (adminUnlocked) { callback(); return; }
-  pendingAction = callback;
-  document.getElementById('pwd-modal').style.display = 'flex';
-  document.getElementById('pwd-input').value = '';
-  document.getElementById('pwd-error').style.display = 'none';
-  setTimeout(() => document.getElementById('pwd-input').focus(), 50);
-}
-
-const PWD_HASH = "d6edbd63328f9061a95a472e01dda331669d3a135bc4f2d05ba23b8a053f4219";
-
-async function hashStr(s) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-async function submitPwd() {
-  const val = document.getElementById('pwd-input').value;
-  const h = await hashStr(val);
-  if (h === PWD_HASH) {
-    adminUnlocked = true;
-    document.getElementById('pwd-modal').style.display = 'none';
-    if (pendingAction) { pendingAction(); pendingAction = null; }
-  } else {
-    document.getElementById('pwd-error').style.display = 'block';
-    document.getElementById('pwd-input').value = '';
-    document.getElementById('pwd-input').focus();
-  }
-}
 
 const GIRONI_LABELS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
 const GROUPS_TEAMS = [
@@ -170,8 +128,7 @@ let R3 = Array(13).fill(null);
 const SC3 = Array(13).fill(null);
 
 // Qualificate per girone: [squadra1, squadra2] o null
-const QUAL_DEFAULT = [["Messico",null],null,null,["USA",null],["Germania",null],null,null,null,null,["Argentina",null],null,null];
-let QUAL = (() => { try { const s = localStorage.getItem('qual'); return s ? JSON.parse(s) : QUAL_DEFAULT.map(v=>v?[...v]:null); } catch(e) { return QUAL_DEFAULT.map(v=>v?[...v]:null); } })();
+let QUAL = [["Messico",null],null,null,["USA",null],["Germania",null],null,null,null,null,["Argentina",null],null,null];
 
 // Schedine T1
 const S1 = [
@@ -405,7 +362,7 @@ function renderStats() {
     return;
   }
 
-  // --- Card 1: distribuzione 1/X/2 ---
+  // --- Card 1: distribuzione 1/X/2 + avanzamento ---
   const c1 = played.filter(r=>r==='1').length;
   const cX = played.filter(r=>r==='X').length;
   const c2 = played.filter(r=>r==='2').length;
@@ -413,11 +370,18 @@ function renderStats() {
   const pX = Math.round(cX/tot*100);
   const p2 = Math.round(c2/tot*100);
   const dominant = c1>=cX&&c1>=c2?'Vittorie casa (1)':cX>=c1&&cX>=c2?'Pareggi (X)':'Vittorie ospite (2)';
+  const totalM = MT1.length + MT2.length + MT3.length;
+  const progress = Math.round(tot/totalM*100);
   const card1 = `
   <div class="stat-card">
     <div class="stat-header"><span class="stat-icon">📊</span><span class="stat-name">Distribuzione risultati</span></div>
-    <div class="stat-value">${tot} partite</div>
-    <div class="stat-sub">risultati reali usciti su ${R1.length+R2.length+R3.length} totali · ${dominant} dominanti</div>
+    <div class="stat-value">${tot} <span style="font-size:1rem;font-weight:500;color:var(--muted)">/ ${totalM}</span></div>
+    <div class="stat-sub">partite giocate · ${dominant} dominanti</div>
+    <div class="sbar-row" style="margin-bottom:.8rem">
+      <span class="sbar-lbl">⚽</span>
+      <div class="sbar-track"><div class="sbar-fill" style="width:${progress}%;background:var(--accent);border-radius:99px"></div></div>
+      <span class="sbar-val" style="color:var(--accent);font-weight:700">${progress}%</span>
+    </div>
     <div class="sbar-row"><span class="sbar-lbl">1</span><div class="sbar-track"><div class="sbar-fill c1" style="width:${p1}%"></div></div><span class="sbar-val">${c1} (${p1}%)</span></div>
     <div class="sbar-row"><span class="sbar-lbl">X</span><div class="sbar-track"><div class="sbar-fill cX" style="width:${pX}%"></div></div><span class="sbar-val">${cX} (${pX}%)</span></div>
     <div class="sbar-row"><span class="sbar-lbl">2</span><div class="sbar-track"><div class="sbar-fill c2" style="width:${p2}%"></div></div><span class="sbar-val">${c2} (${p2}%)</span></div>
@@ -513,62 +477,33 @@ function renderRanking() {
 }
 
 function renderInputs() {
-  const matchRow = (m, i, R, SC, t) => {
+  const matchRow = (m, i, R, SC) => {
     const rawScore = SC && SC[i] ? (SC[i].match(/\d+-\d+/)||[''])[0] : '';
+    const res = R[i];
     const score = rawScore ? `<span class="match-score">${rawScore}</span>` : '';
-    return `
-    <div class="match-row">
-      <span class="match-label" title="${m}">${m}</span>
-      ${score}
-      <div class="btn-group">
-        ${['1','X','2'].map(v=>`<button class="btn-res ${R[i]===v?'sel-'+v:''}" onclick="setR(${t},${i},'${v}')">${v}</button>`).join('')}
-      </div>
-    </div>`;
+    const tagCls = res==='1'?'tag-1':res==='X'?'tag-X':res==='2'?'tag-2':'';
+    const tag = res ? `<span class="tag ${tagCls}">${res}</span>` : `<span class="res-nd">—</span>`;
+    return `<div class="match-row"><span class="match-label" title="${m}">${m}</span>${score}${tag}</div>`;
   };
-  document.getElementById('input-t1').innerHTML = MT1.map((m,i) => matchRow(m,i,R1,SC1,1)).join('');
-  document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2,2)).join('');
-  document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,SC3,3)).join('');
-  // Gironi input
+  document.getElementById('input-t1').innerHTML = MT1.map((m,i) => matchRow(m,i,R1,SC1)).join('');
+  document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2)).join('');
+  document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,SC3)).join('');
+  // Gironi read-only
   document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => {
     const sel = QUAL[i] || [];
-    const teams = GROUPS_TEAMS[i];
-    return `
-    <div class="girone-card">
+    const bothKnown = sel.length === 2;
+    return `<div class="girone-card">
       <div class="girone-label">Girone ${g}</div>
-      <div class="girone-btns">
-        ${teams.map(t => {
-          const isSel = sel.includes(t);
-          const isDis = !isSel && sel.length >= 2;
-          return `<button class="btn-team${isSel?' sel-team':''}${isDis?' dis-team':''}" onclick="toggleQual(${i},'${t}')">${t}</button>`;
+      <div class="girone-teams-ro">
+        ${GROUPS_TEAMS[i].map(t => {
+          const isQ = sel.includes(t);
+          const isOut = bothKnown && !isQ;
+          return `<span class="gteam-ro${isQ?' gteam-ok':isOut?' gteam-no':''}">${t}</span>`;
         }).join('')}
       </div>
-      ${sel.length>0?`<div class="girone-sel-info">✓ ${sel.join(' + ')}</div>`:''}
+      ${sel.length>0?`<div class="girone-sel-info">✓ ${sel.filter(Boolean).join(' + ')}</div>`:''}
     </div>`;
   }).join('');
-}
-
-function setR(t, idx, val) {
-  requireAdmin(() => {
-    if(t===1) R1[idx] = R1[idx]===val?null:val;
-    else if(t===2) R2[idx] = R2[idx]===val?null:val;
-    else R3[idx] = R3[idx]===val?null:val;
-    renderAll();
-  });
-}
-
-function toggleQual(i, team) {
-  requireAdmin(() => {
-    if (!QUAL[i]) QUAL[i] = [];
-    const idx = QUAL[i].indexOf(team);
-    if (idx >= 0) {
-      QUAL[i].splice(idx, 1);
-      if (QUAL[i].length === 0) QUAL[i] = null;
-    } else if (QUAL[i].length < 2) {
-      QUAL[i].push(team);
-    }
-    try { localStorage.setItem('qual', JSON.stringify(QUAL)); } catch(e) {}
-    renderAll();
-  });
 }
 
 function renderSchedine() {
