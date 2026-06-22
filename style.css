@@ -127,7 +127,7 @@ nav button span {
 .stat-value{font-size:2rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:8px}
 .stat-sub{font-size:14px;color:var(--muted);margin-bottom:.9rem}
 .sbar-row{display:flex;align-items:center;gap:7px;margin-bottom:8px}
-.sbar-lbl{font-size:11px;min-width:52px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.sbar-lbl{font-size:11px;min-width: 32px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
 .sbar-lbl.wide{min-width:140px;max-width:140px}
 .sbar-track{flex:1;height:16px;background:#f0ede6;border-radius:4px;overflow:hidden;position:relative}
 .sbar-fill{height:100%;border-radius:4px;transition:width .5s}
@@ -137,7 +137,7 @@ nav button span {
 .sbar-fill.cgood{background:var(--green)}
 .sbar-fill.cbad{background:var(--accent)}
 .sbar-fill.cgray{background:#bbb}
-.sbar-val{font-size:12px;min-width:34px;color:var(--muted);font-weight:600}
+.sbar-val{font-size:12px;min-width: 50px;color:var(--muted);font-weight:600;text-align: right;}
 .sbar-threshold{position:absolute;top:0;bottom:0;width:2px;background:#888;opacity:.5}
 .stat-note{font-size:11px;color:var(--muted);margin-top:.6rem;font-style:italic}
 .dist-inline{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.8rem 1.1rem;margin-bottom:.8rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
