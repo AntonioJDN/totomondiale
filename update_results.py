@@ -128,7 +128,7 @@ def build_lookup(data):
             try:
                 dt_utc = datetime.fromisoformat(utc_date.replace('Z', '+00:00'))
                 dt_cet = dt_utc + timedelta(hours=2)
-                date_str = dt_cet.strftime('%d/%m - %H:%M')
+                date_str = dt_cet.strftime('%d/%m - %H')
             except Exception:
                 pass
 
@@ -149,6 +149,20 @@ def build_lookup(data):
         lookup[f"{away_it}-{home_it}"] = entry_rev
 
     return lookup
+
+
+def build_crests(data):
+    """Costruisce dizionario {nome_italiano: crest_url} dai dati API."""
+    crests = {}
+    for m in data.get('matches', []):
+        for team_key in ['homeTeam', 'awayTeam']:
+            t = m[team_key]
+            name_api = t.get('name', '')
+            name_it = TEAM_MAP.get(name_api, name_api)
+            crest = t.get('crest', '')
+            if crest:
+                crests[name_it] = crest
+    return crests
 
 
 def parse_existing(content, name, let=True):
@@ -205,7 +219,7 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
     return R, SC, DT
 
 
-def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3):
+def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests):
     with open(INDEX_FILE, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -227,6 +241,13 @@ def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3):
     content = replace_var(content, 'DT1', dt1, let=True)
     content = replace_var(content, 'DT2', dt2, let=True)
     content = replace_var(content, 'DT3', dt3, let=True)
+
+    # Aggiorna CRESTS
+    items = ','.join(f'"{k}":"{v}"' for k, v in sorted(crests.items()))
+    new_crests = f'const CRESTS = {{{items}}};'
+    content, n = re.subn(r'const CRESTS = \{[^}]*\};', new_crests, content)
+    if n == 0:
+        print("WARN: CRESTS non trovato in index.html", file=sys.stderr)
 
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -262,5 +283,8 @@ if __name__ == '__main__':
     print("\nT3:")
     r3, sc3, dt3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
 
-    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3)
+    crests = build_crests(data)
+    print(f"Loghi squadre trovati: {len(crests)}")
+
+    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests)
     print("\nindex.html aggiornato.")

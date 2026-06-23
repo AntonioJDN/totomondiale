@@ -129,6 +129,7 @@ const SC3 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
 let DT1 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
 let DT2 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
 let DT3 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
+const CRESTS = {};
 
 // Qualificate per girone: [squadra1, squadra2] o null
 let QUAL = [["Messico",null],null,null,["USA",null],["Germania",null],null,null,null,["Francia","Norvegia"],["Argentina",null],null,null];
@@ -243,6 +244,7 @@ const S3 = [
   {n:"Andrea Pascale",p:["X","1","2","1","2","2","X","1","2","2","1","X","1"]},
   {n:"Manicomio",p:["2","1","2","2","2","2","1","2","X","2","X","2","1"]},
   {n:"Felton",p:["1","X","2","X","2","2","1","1","2","X","1","2","X"]},
+  {n:"Alexrsb",p:["X","1","2","X","2","2","1","X","X","X","1","X","X"]},
 ];
 
 // Pronostici gironi: ogni riga = [nome, girA, girB, ... girL]
@@ -517,7 +519,8 @@ function renderInputs() {
         ${GROUPS_TEAMS[i].map(t => {
           const isQ = sel.includes(t);
           const isOut = bothKnown && !isQ;
-          return `<span class="gteam-ro${isQ?' gteam-ok':isOut?' gteam-no':''}">${t}</span>`;
+          const crestImg = CRESTS[t] ? `<img src="${CRESTS[t]}" class="team-crest">` : '';
+          return `<span class="gteam-ro${isQ?' gteam-ok':isOut?' gteam-no':''}">${crestImg}${t}</span>`;
         }).join('')}
       </div>
       ${sel.length>0?`<div class="girone-sel-info">✓ ${sel.filter(Boolean).join(' + ')}</div>`:''}
@@ -531,13 +534,19 @@ function renderSchedine() {
 
   const matchTh = (m, res, sc, dt, cls) => {
     const score = sc ? (sc.match(/\d+-\d+/)||[''])[0] : '';
+    const dashIdx = m.indexOf('-');
+    const home = dashIdx >= 0 ? m.slice(0, dashIdx) : m;
+    const away = dashIdx >= 0 ? m.slice(dashIdx + 1) : '';
+    const homeC = CRESTS[home] ? `<img src="${CRESTS[home]}" class="sh-crest">` : '';
+    const awayC = CRESTS[away] ? `<img src="${CRESTS[away]}" class="sh-crest">` : '';
+    const displayName = away ? `${homeC}${home} ${awayC}${away}` : `${home}`;
     let resLine = '';
     if (score) {
       resLine = `<div class="sh-res">${score}</div>`;
     } else if (dt) {
       resLine = `<div class="sh-date">${dt}</div>`;
     }
-    return `<th class="${cls}"><div class="sh-name">${m}</div>${resLine}</th>`;
+    return `<th class="${cls}"><div class="sh-name">${displayName}</div>${resLine}</th>`;
   };
 
   let html = '<thead><tr>';
@@ -603,7 +612,8 @@ function renderGironi() {
           if (isOk) tcls = 'gt-ok';
           else if (bothKnown) tcls = 'gt-no';
         }
-        return `<div class="${tcls}" title="${t}">${t.substring(0,7)}</div>`;
+        const cImg = CRESTS[t] ? `<img src="${CRESTS[t]}" class="team-crest">` : '';
+        return `<div class="${tcls}" title="${t}">${cImg}${t.substring(0,7)}</div>`;
       }).join('');
       html += `<td class="${cls}" title="${pred}">${teamLines}</td>`;
     });

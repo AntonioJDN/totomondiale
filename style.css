@@ -70,6 +70,8 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .sh-res{font-size:10px;font-weight:800;margin-top:3px}
 .sh-score{font-size:9px;font-weight:400;opacity:.8}
 .sh-date{font-size:9px;font-weight:500;margin-top:3px;color:inherit;opacity:.65}
+.sh-crest{display:none}
+.team-crest{height:14px;width:auto;vertical-align:middle;margin-right:3px;object-fit:contain}
 .stable td{padding:4px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
 .stable td.ntd{text-align:left;padding-left:10px;font-weight:500;position:sticky;left:0;z-index:1;background:var(--surface)}
 .stable tr.mer td.ntd{background:var(--me-bg)}
