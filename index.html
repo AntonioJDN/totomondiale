@@ -466,19 +466,27 @@ function renderStats() {
   document.getElementById('stats-grid').innerHTML = card1 + card2 + card3;
 }
 
+function compRank(sorted, tot) {
+  return sorted.filter(s => s.tot > tot).length + 1;
+}
+
 function renderRanking() {
   const sorted = buildRanking();
   const medals = ['🥇','🥈','🥉'];
-  document.getElementById('rank-body').innerHTML = sorted.map((r,i) => `
+  document.getElementById('rank-body').innerHTML = sorted.map(r => {
+    const rank = compRank(sorted, r.tot);
+    const rankLabel = rank <= 3 ? medals[rank-1] : rank;
+    return `
     <tr class="${r.n===ME?'me':''}">
-      <td style="width:36px;color:var(--muted);font-weight:700">${i<3?medals[i]:i+1}</td>
+      <td style="width:36px;color:var(--muted);font-weight:700">${rankLabel}</td>
       <td style="font-weight:500"><span class="pname-link" onclick="showPartModal('${r.n}')">${r.n}</span>${r.n===ME?'<span class="me-badge">TU</span>':''}</td>
       <td class="sub-pts">${r.t1}</td>
       <td class="sub-pts">${r.t2}</td>
       <td class="sub-pts">${r.t3}</td>
       <td class="sub-pts" style="color:var(--gold)">${r.gir}</td>
       <td class="pts-cell">${r.tot}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 function renderInputs() {
@@ -605,7 +613,7 @@ function updateMeta() {
 function showPartModal(name) {
   const ranking = buildRanking();
   const rankIdx = ranking.findIndex(r=>r.n===name);
-  const rank = rankIdx >= 0 ? rankIdx+1 : '?';
+  const rank = rankIdx >= 0 ? compRank(ranking, ranking[rankIdx].tot) : '?';
   const r = ranking[rankIdx] || {t1:0,t2:0,t3:0,gir:0,tot:0};
 
   document.getElementById('part-name').textContent = name;
