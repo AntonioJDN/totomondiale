@@ -525,18 +525,22 @@ function renderInputs() {
 function renderSchedine() {
   const names = buildRanking().map(r=>r.n);
   const allR = [...R1,...R2,...R3];
-  const allM = [...MT1,...MT2,...MT3];
-  let html = '<thead>';
-  html += '<tr><th class="nc">Nome</th>';
-  MT1.forEach((_,i) => html+=`<th class="h1" title="${MT1[i]}">T1-${i+1}</th>`);
-  MT2.forEach((_,i) => html+=`<th class="h2" title="${MT2[i]}">T2-${i+1}</th>`);
-  MT3.forEach((_,i) => html+=`<th class="h3" title="${MT3[i]}">T3-${i+1}</th>`);
-  html += '<th>Pt</th></tr>';
-  html += '<tr><th class="nc" style="font-size:9px;color:#bbb">ordine classifica</th>';
-  MT1.forEach(m => html+=`<th class="h1" style="font-size:9px" title="${m}">${m.split('-')[0].substring(0,5)}</th>`);
-  MT2.forEach(m => html+=`<th class="h2" style="font-size:9px" title="${m}">${m.split('-')[0].substring(0,5)}</th>`);
-  MT3.forEach(m => html+=`<th class="h3" style="font-size:9px" title="${m}">${m.split('T3-P')[1]||m.substring(0,5)}</th>`);
-  html += '<th></th></tr></thead><tbody>';
+
+  const matchTh = (m, res, sc, cls) => {
+    const score = sc ? (sc.match(/\d+-\d+/)||[''])[0] : '';
+    const resLine = res
+      ? `<div class="sh-res">${res}${score?' <span class="sh-score">'+score+'</span>':''}</div>`
+      : '';
+    return `<th class="${cls}"><div class="sh-name">${m}</div>${resLine}</th>`;
+  };
+
+  let html = '<thead><tr>';
+  html += '<th class="nc" style="position:sticky;left:0;z-index:3;background:#fafaf8">Nome<div style="font-size:8px;color:#bbb;font-weight:400">ordine classifica</div></th>';
+  MT1.forEach((m,i) => html += matchTh(m, R1[i], SC1[i], 'h1'));
+  MT2.forEach((m,i) => html += matchTh(m, R2[i], SC2[i], 'h2'));
+  MT3.forEach((m,i) => html += matchTh(m, R3[i], SC3[i], 'h3'));
+  html += '<th class="ptd-h">Pt</th>';
+  html += '</tr></thead><tbody>';
 
   names.forEach(name => {
     const ss1 = S1.find(s=>s.n===name);

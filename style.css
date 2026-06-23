@@ -65,6 +65,10 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .stable th.h1{background:var(--blue-light);color:var(--blue)}
 .stable th.h2{background:var(--green-light);color:var(--green)}
 .stable th.h3{background:#f3eeff;color:#6030b0}
+.stable th.h1,.stable th.h2,.stable th.h3{white-space:normal;min-width:62px;max-width:80px;vertical-align:top;line-height:1.3}
+.sh-name{font-size:9px;font-weight:600;word-break:break-word}
+.sh-res{font-size:10px;font-weight:800;margin-top:3px}
+.sh-score{font-size:9px;font-weight:400;opacity:.8}
 .stable td{padding:4px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
 .stable td.ntd{text-align:left;padding-left:10px;font-weight:500;position:sticky;left:0;z-index:1;background:var(--surface)}
 .stable tr.mer td.ntd{background:var(--me-bg)}
@@ -73,7 +77,8 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .ok{background:#d4edda;color:#155724;border-radius:2px;font-weight:700}
 .no{background:#f8d7da;color:#721c24;border-radius:2px}
 .nd{color: #888;}
-.ptd{font-weight:700;color:var(--accent);background:#fafaf8!important;border-left:2px solid var(--border)}
+.ptd{font-weight:700;color:var(--accent);background:#fafaf8!important;border-left:2px solid var(--border);position:sticky;right:0;z-index:1}
+.ptd-h{font-weight:700;background:#fafaf8;border-left:2px solid var(--border);position:sticky;right:0;z-index:3}
 
 /* GIRONI */
 .gironi-grid{display:grid;grid-template-columns: repeat(auto-fill,minmax(200px,1fr));gap:7px;margin-bottom:1rem}
