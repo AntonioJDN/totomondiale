@@ -72,7 +72,7 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .stable tr.mer td.ntd{border-left:3px solid var(--me-border)}
 .ok{background:#d4edda;color:#155724;border-radius:2px;font-weight:700}
 .no{background:#f8d7da;color:#721c24;border-radius:2px}
-.nd{color:#ccc}
+.nd{color: #888;}
 .ptd{font-weight:700;color:var(--accent);background:#fafaf8!important;border-left:2px solid var(--border)}
 
 /* GIRONI */
