@@ -83,7 +83,12 @@
 
 <!-- SCHEDINE -->
 <div id="tab-schedine" class="tab-content">
-  <div class="info-bar"><span class="info-dot"></span>Verde = giusto · Rosso = sbagliato · Grigio = non giocata</div>
+  <div class="schedine-topbar">
+    <div class="info-bar" style="margin:0;flex:1"><span class="info-dot"></span>Verde = giusto · Rosso = sbagliato · Grigio = non giocata</div>
+    <div class="sched-search-wrap">
+      <input id="sched-search" class="sched-search" type="text" placeholder="🔍 Cerca partecipante…" oninput="filterSchedine(this.value)">
+    </div>
+  </div>
   <div class="swrap"><table class="stable" id="stable"></table></div>
 </div>
 
@@ -540,6 +545,14 @@ function renderInputs() {
       ${sel.length>0?`<div class="girone-sel-info">✓ ${sel.filter(Boolean).join(' + ')}</div>`:''}
     </div>`;
   }).join('');
+}
+
+function filterSchedine(q) {
+  const term = q.trim().toLowerCase();
+  document.querySelectorAll('#stable tbody tr').forEach(tr => {
+    const name = tr.querySelector('.ntd')?.textContent.toLowerCase() || '';
+    tr.style.display = (!term || name.includes(term)) ? '' : 'none';
+  });
 }
 
 function renderSchedine() {

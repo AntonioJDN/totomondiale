@@ -59,6 +59,10 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 
 /* SCHEDINE */
 .swrap{overflow-x:auto;border-radius:var(--rl);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.schedine-topbar{display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap}
+.sched-search-wrap{flex-shrink:0}
+.sched-search{border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;outline:none;background:var(--surface);color:var(--text);width:200px;transition:border-color .2s}
+.sched-search:focus{border-color:var(--accent)}
 .stable{border-collapse:collapse;background:var(--surface);font-size:11px;white-space:nowrap;min-width:100%}
 .stable th{padding:5px 5px;font-size:10px;font-weight:600;color:var(--muted);background:#fafaf8;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
 .stable th.nc{text-align:left;min-width:120px;padding-left:10px;position:sticky;left:0;z-index:2;background:#fafaf8}
