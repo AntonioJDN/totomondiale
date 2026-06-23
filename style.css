@@ -71,7 +71,7 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .sh-tname{font-size:9px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .sh-tscore{font-size:10px;font-weight:800;flex-shrink:0;margin-left:2px}
 .sh-date{font-size:9px;font-weight:500;margin-top:2px;opacity:.65;white-space:nowrap}
-.team-crest{height:auto;width:20px;vertical-align:middle;margin-right:8px;object-fit:contain}
+.team-crest{height: auto;width:20px;vertical-align:middle;margin-right:8px;object-fit:contain}
 .stable td{padding:4px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
 .stable td.ntd{text-align:left;padding-left:10px;font-weight:500;position:sticky;left:0;z-index:1;background:var(--surface)}
 .stable tr.mer td.ntd{background:var(--me-bg)}
@@ -96,7 +96,7 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .gtable{border-collapse:collapse;background:var(--surface);font-size:11px;white-space:nowrap;min-width:100%}
 .gtable th{padding:6px 8px;font-size:10px;font-weight:600;color:var(--muted);background:#fafaf8;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
 .gtable th.nc{text-align:left;min-width:120px;padding-left:10px}
-.gtable td{padding:5px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;font-size:11px}
+.gtable td{padding:5px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;font-size:11px;}
 .gtable td.ntd{text-align:left;padding-left:10px;font-weight:500}
 .gtable tr.mer td{background:var(--me-bg)}
 .gtable tr.mer td.ntd{border-left:3px solid var(--me-border)}
@@ -107,7 +107,8 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .gptd{font-weight:700;color:var(--gold);background:#fafaf8!important;border-left:2px solid var(--border)}
 .gt-ok{font-weight:700;color:#166534;line-height:1.4}
 .gt-no{color:#b0b8c1;text-decoration:line-through;font-weight:400;line-height:1.4}
-.gt-nd{color:#bbb;line-height:1.4}
+.gt-nd{color: #666;line-height:1.4}
+.gt-ok, .gt-nd {text-align: left;padding: 2px 0;}
 
 @media(max-width:600px){
 header{

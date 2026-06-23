@@ -600,7 +600,8 @@ function renderGironi() {
       const pts = calcGironiPts(pred, qual);
       tot += pts;
       const cls = !qual||!qual[0] ? 'gnd' : pts===3 ? 'gok2' : pts===1 ? 'gok1' : bothKnown ? 'gno' : 'gnd';
-      const teamLines = pred.split(' ').map(t => {
+      const predTeams = GROUPS_TEAMS[i].filter(t => pred.includes(t));
+      const teamLines = predTeams.map(t => {
         const tl = t.toLowerCase().trim();
         let tcls = 'gt-nd';
         if (qual && qual[0]) {
@@ -714,7 +715,7 @@ function showPartModal(name) {
         pts = calcGironiPts(pred, qual);
         cls = pts===3 ? 'ok2' : pts===1 ? 'ok1' : bothKnownM ? 'no' : 'nd';
       }
-      const teams = pred.split(' ');
+      const teams = GROUPS_TEAMS[i].filter(t => pred.includes(t));
       const teamTags = teams.map(t => {
         const tl = t.toLowerCase().trim();
         let tcls = 'part-team-nd';
