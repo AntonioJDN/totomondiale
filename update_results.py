@@ -104,10 +104,12 @@ def fetch_matches():
 
 
 def build_lookup(data):
-    """Costruisce dizionario {Casa-Ospite: {result, score_str}} dai dati API.
+    """Costruisce dizionario {Casa-Ospite: {result, score, date}} dai dati API.
     Indicizza entrambi gli ordini (Casa-Ospite e Ospite-Casa) per resistere
     a discrepanze home/away rispetto ai nomi hardcoded in MT1/MT2.
     """
+    from datetime import datetime, timezone, timedelta
+
     lookup = {}
     for m in data.get('matches', []):
         home_api = m['homeTeam']['name']
@@ -119,6 +121,20 @@ def build_lookup(data):
         hs = score.get('home')
         as_ = score.get('away')
 
+        # Estrai data/ora CET (UTC+2 in estate)
+        utc_date = m.get('utcDate', '')
+        date_str = None
+        if utc_date:
+            try:
+                dt_utc = datetime.fromisoformat(utc_date.replace('Z', '+00:00'))
+                dt_cet = dt_utc + timedelta(hours=2)
+                date_str = dt_cet.strftime('%d/%m - %H:%M')
+            except Exception:
+                pass
+
+        entry_fwd = {'date': date_str}
+        entry_rev = {'date': date_str}
+
         if status == 'FINISHED' and hs is not None and as_ is not None:
             if hs > as_:
                 result_fwd, result_rev = '1', '2'
@@ -126,16 +142,12 @@ def build_lookup(data):
                 result_fwd = result_rev = 'X'
             else:
                 result_fwd, result_rev = '2', '1'
-            # Chiave normale (home-away API)
-            lookup[f"{home_it}-{away_it}"] = {
-                'result': result_fwd,
-                'score': f"{hs}-{as_}"
-            }
-            # Chiave invertita (away-home) — result e score vengono adattati
-            lookup[f"{away_it}-{home_it}"] = {
-                'result': result_rev,
-                'score': f"{as_}-{hs}"
-            }
+            entry_fwd.update({'result': result_fwd, 'score': f"{hs}-{as_}"})
+            entry_rev.update({'result': result_rev, 'score': f"{as_}-{hs}"})
+
+        lookup[f"{home_it}-{away_it}"] = entry_fwd
+        lookup[f"{away_it}-{home_it}"] = entry_rev
+
     return lookup
 
 
@@ -160,15 +172,20 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
     """
     Regola fondamentale: aggiorna solo se l'API restituisce FINISHED.
     Non sovrascrive mai un valore esistente con null.
+    Restituisce anche le date (DT) per ogni partita.
     """
     R = []
     SC = []
+    DT = []
     for i, name in enumerate(match_names):
         api = lookup.get(name)
         cur_r = existing_R[i] if i < len(existing_R) else None
         cur_sc = existing_SC[i] if i < len(existing_SC) else None
 
-        if api:
+        date_val = f'"{api["date"]}"' if api and api.get('date') else 'null'
+        DT.append(date_val)
+
+        if api and api.get('result'):
             # L'API ha un risultato confermato → aggiorna sempre
             R.append(f'"{api["result"]}"')
             SC.append(f'"{api["score"]}"')
@@ -185,10 +202,10 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
             # Nessuno ha niente → null
             R.append('null')
             SC.append('null')
-    return R, SC
+    return R, SC, DT
 
 
-def update_html(r1, sc1, r2, sc2, r3, sc3):
+def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3):
     with open(INDEX_FILE, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -207,6 +224,9 @@ def update_html(r1, sc1, r2, sc2, r3, sc3):
     content = replace_var(content, 'SC1', sc1, let=False)
     content = replace_var(content, 'SC2', sc2, let=False)
     content = replace_var(content, 'SC3', sc3, let=False)
+    content = replace_var(content, 'DT1', dt1, let=True)
+    content = replace_var(content, 'DT2', dt2, let=True)
+    content = replace_var(content, 'DT3', dt3, let=True)
 
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -236,11 +256,11 @@ if __name__ == '__main__':
     existing_sc3 = parse_existing(current, 'SC3', let=False)
 
     print("\nT1:")
-    r1, sc1 = build_arrays(MT1, lookup, existing_r1, existing_sc1)
+    r1, sc1, dt1 = build_arrays(MT1, lookup, existing_r1, existing_sc1)
     print("\nT2:")
-    r2, sc2 = build_arrays(MT2, lookup, existing_r2, existing_sc2)
+    r2, sc2, dt2 = build_arrays(MT2, lookup, existing_r2, existing_sc2)
     print("\nT3:")
-    r3, sc3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
+    r3, sc3, dt3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
 
-    update_html(r1, sc1, r2, sc2, r3, sc3)
+    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3)
     print("\nindex.html aggiornato.")

@@ -126,6 +126,9 @@ let R1 = ["1","X","1","X","1","X","1","X","1","1","1","1","2"];
 let R2 = ["X","1","2","2","1","2","X","2","1","1","2",null,null];
 let R3 = Array(13).fill(null);
 const SC3 = Array(13).fill(null);
+let DT1 = Array(13).fill(null);
+let DT2 = Array(13).fill(null);
+let DT3 = Array(13).fill(null);
 
 // Qualificate per girone: [squadra1, squadra2] o null
 let QUAL = [["Messico",null],null,null,["USA",null],["Germania",null],null,null,null,["Francia","Norvegia"],["Argentina",null],null,null];
@@ -526,19 +529,22 @@ function renderSchedine() {
   const names = buildRanking().map(r=>r.n);
   const allR = [...R1,...R2,...R3];
 
-  const matchTh = (m, res, sc, cls) => {
+  const matchTh = (m, res, sc, dt, cls) => {
     const score = sc ? (sc.match(/\d+-\d+/)||[''])[0] : '';
-    const resLine = res
-      ? `<div class="sh-res">${res}${score?' <span class="sh-score">'+score+'</span>':''}</div>`
-      : '';
+    let resLine = '';
+    if (score) {
+      resLine = `<div class="sh-res">${score}</div>`;
+    } else if (dt) {
+      resLine = `<div class="sh-date">${dt}</div>`;
+    }
     return `<th class="${cls}"><div class="sh-name">${m}</div>${resLine}</th>`;
   };
 
   let html = '<thead><tr>';
   html += '<th class="nc" style="position:sticky;left:0;z-index:3;background:#fafaf8">Nome<div style="font-size:8px;color:#bbb;font-weight:400">ordine classifica</div></th>';
-  MT1.forEach((m,i) => html += matchTh(m, R1[i], SC1[i], 'h1'));
-  MT2.forEach((m,i) => html += matchTh(m, R2[i], SC2[i], 'h2'));
-  MT3.forEach((m,i) => html += matchTh(m, R3[i], SC3[i], 'h3'));
+  MT1.forEach((m,i) => html += matchTh(m, R1[i], SC1[i], DT1[i], 'h1'));
+  MT2.forEach((m,i) => html += matchTh(m, R2[i], SC2[i], DT2[i], 'h2'));
+  MT3.forEach((m,i) => html += matchTh(m, R3[i], SC3[i], DT3[i], 'h3'));
   html += '<th class="ptd-h">Pt</th>';
   html += '</tr></thead><tbody>';
 
