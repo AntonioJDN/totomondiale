@@ -533,20 +533,16 @@ function renderSchedine() {
   const allR = [...R1,...R2,...R3];
 
   const matchTh = (m, res, sc, dt, cls) => {
-    const score = sc ? (sc.match(/\d+-\d+/)||[''])[0] : '';
+    const sp = sc ? sc.match(/(\d+)-(\d+)/) : null;
     const dashIdx = m.indexOf('-');
     const home = dashIdx >= 0 ? m.slice(0, dashIdx) : m;
     const away = dashIdx >= 0 ? m.slice(dashIdx + 1) : '';
     const homeC = CRESTS[home] ? `<img src="${CRESTS[home]}" class="sh-crest">` : '';
     const awayC = CRESTS[away] ? `<img src="${CRESTS[away]}" class="sh-crest">` : '';
-    const displayName = away ? `${homeC}${home} ${awayC}${away}` : `${home}`;
-    let resLine = '';
-    if (score) {
-      resLine = `<div class="sh-res">${score}</div>`;
-    } else if (dt) {
-      resLine = `<div class="sh-date">${dt}</div>`;
-    }
-    return `<th class="${cls}"><div class="sh-name">${displayName}</div>${resLine}</th>`;
+    const homeRow = `<div class="sh-team">${homeC}<span class="sh-tname">${home}</span>${sp?`<span class="sh-tscore">${sp[1]}</span>`:''}</div>`;
+    const awayRow = `<div class="sh-team">${awayC}<span class="sh-tname">${away}</span>${sp?`<span class="sh-tscore">${sp[2]}</span>`:''}</div>`;
+    const dateRow = !sp && dt ? `<div class="sh-date">${dt}</div>` : '';
+    return `<th class="${cls}">${homeRow}${awayRow}${dateRow}</th>`;
   };
 
   let html = '<thead><tr>';
