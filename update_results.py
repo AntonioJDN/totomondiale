@@ -23,6 +23,9 @@ TEAM_MAP = {
     'Czechia':                  'Rep.Ceca',
     'Canada':                   'Canada',
     'Bosnia and Herzegovina':   'Bosnia',
+    'Bosnia & Herzegovina':     'Bosnia',
+    'Bosnia-Herzegovina':       'Bosnia',
+    'Bosnia':                   'Bosnia',
     'Qatar':                    'Qatar',
     'Switzerland':              'Svizzera',
     'Brazil':                   'Brasile',
@@ -116,6 +119,11 @@ def build_lookup(data):
         away_api = m['awayTeam']['name']
         home_it = TEAM_MAP.get(home_api, home_api)
         away_it = TEAM_MAP.get(away_api, away_api)
+        # Log squadre non mappate (per debug)
+        if home_it == home_api and home_api not in TEAM_MAP:
+            print(f"  [UNMAPPED] {home_api}", file=sys.stderr)
+        if away_it == away_api and away_api not in TEAM_MAP:
+            print(f"  [UNMAPPED] {away_api}", file=sys.stderr)
         status = m.get('status', '')
         score = m.get('score', {}).get('fullTime', {})
         hs = score.get('home')
