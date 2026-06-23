@@ -463,7 +463,7 @@ function renderStats() {
     <div class="stat-note">La barra grigia indica il limite del 33% (1 su 3 a caso)</div>
   </div>`;
 
-  document.getElementById('stats-grid').innerHTML = card1 + card2 + card3;
+  document.getElementById('stats-grid').innerHTML = card1 + card2 + (belowRandom.length > 0 ? card3 : '');
 }
 
 function compRank(sorted, tot) {
