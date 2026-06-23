@@ -472,10 +472,11 @@ function compRank(sorted, tot) {
 
 function renderRanking() {
   const sorted = buildRanking();
-  const medals = ['🥇','🥈','🥉'];
+  let lastRank = null;
   document.getElementById('rank-body').innerHTML = sorted.map(r => {
     const rank = compRank(sorted, r.tot);
-    const rankLabel = rank <= 3 ? medals[rank-1] : rank;
+    const rankLabel = rank === lastRank ? '–' : rank;
+    lastRank = rank;
     return `
     <tr class="${r.n===ME?'me':''}">
       <td style="width:36px;color:var(--muted);font-weight:700">${rankLabel}</td>
