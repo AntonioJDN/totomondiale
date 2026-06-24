@@ -139,6 +139,19 @@ const CRESTS = {"Algeria":"https://crests.football-data.org/algeria.svg","Arabia
 // Qualificate per girone: [squadra1, squadra2] o null
 let QUAL = [["Messico",null],null,null,["USA",null],["Germania",null],null,null,null,["Francia","Norvegia"],["Argentina",null],["Colombia",null],null];
 
+// Sedicesimi — nascosti finché SHOW_S4 = false
+const SHOW_S4 = false;
+const S4_ENC = ""; // predizioni base64-encoded, inserite man mano
+let MT4 = []; // partite sedicesimi (da riempire quando note)
+let R4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+const SC4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+let DT4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+
+function getS4() {
+  if (!S4_ENC) return [];
+  try { return JSON.parse(atob(S4_ENC)); } catch(e) { return []; }
+}
+
 // Schedine T1
 const S1 = [
   {n:"Riccardo Coppola",p:["1","1","1","X","2","1","1","1","1","1","1","1","2"]},
@@ -381,10 +394,11 @@ function buildRanking() {
   const p1 = calcPts12(S1, R1);
   const p2 = calcPts12(S2, R2);
   const p3 = calcPts12(S3, R3);
+  const p4 = SHOW_S4 ? calcPts12(getS4(), R4) : {};
   const all = {};
   allNames().forEach(n => {
     all[n] = {
-      t1: p1[n]||0, t2: p2[n]||0, t3: p3[n]||0,
+      t1: p1[n]||0, t2: p2[n]||0, t3: p3[n]||0, t4: p4[n]||0,
       gir: 0
     };
   });
@@ -392,7 +406,7 @@ function buildRanking() {
     if (all[s.n]) all[s.n].gir = calcGironiTotale(s.g);
   });
   return Object.entries(all)
-    .map(([n,v]) => ({n, ...v, tot: v.t1+v.t2+v.t3+v.gir}))
+    .map(([n,v]) => ({n, ...v, tot: v.t1+v.t2+v.t3+v.t4+v.gir}))
     .sort((a,b) => b.tot-a.tot || b.t1-a.t1 || b.t2-a.t2);
 }
 
@@ -600,6 +614,9 @@ function renderSchedine() {
   MT1.forEach((m,i) => html += matchTh(m, R1[i], SC1[i], DT1[i], 'h1'));
   MT2.forEach((m,i) => html += matchTh(m, R2[i], SC2[i], DT2[i], 'h2'));
   MT3.forEach((m,i) => html += matchTh(m, R3[i], SC3[i], DT3[i], 'h3'));
+  if (SHOW_S4 && MT4.length > 0) {
+    MT4.forEach((m,i) => html += matchTh(m, R4[i], SC4[i], DT4[i], 'h4'));
+  }
   html += '<th class="ptd-h">Pt</th>';
   html += '</tr></thead><tbody>';
 
@@ -620,6 +637,22 @@ function renderSchedine() {
       const cls = !r?'nd':(p===r?'ok':'no');
       html += `<td class="${cls}">${p||'—'}</td>`;
     });
+    // S4: visibile solo se SHOW_S4; per partite non ancora giocate mostra "?"
+    if (SHOW_S4 && MT4.length > 0) {
+      const s4data = getS4();
+      const ss4 = s4data.find(s=>s.n===name);
+      MT4.forEach((_,i) => {
+        const r = R4[i];
+        if (!r) {
+          html += `<td class="nd">?</td>`;
+        } else {
+          const p = ss4 ? ss4.p[i] : '-';
+          const cls = p===r ? 'ok' : 'no';
+          if (p===r) pts++;
+          html += `<td class="${cls}">${p}</td>`;
+        }
+      });
+    }
     html += `<td class="ptd">${pts}</td></tr>`;
   });
   html += '</tbody>';
