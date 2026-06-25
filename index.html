@@ -432,19 +432,30 @@ function renderStandings() {
   let html = '<div class="standings-grid">';
   STANDINGS.forEach((group, i) => {
     if (!group || !group.length) return;
-    html += `<div class="standing-card"><div class="standing-label">Girone ${GIRONI_LABELS[i]}</div>`;
+    html += `<div class="standing-card">
+      <div class="standing-label">Girone ${GIRONI_LABELS[i]}</div>
+      <table class="standing-table">
+        <thead><tr>
+          <th>#</th><th></th><th class="st-name">Squadra</th>
+          <th>PG</th><th>V</th><th>N</th><th>S</th>
+          <th>GF</th><th>GS</th><th>Dr</th><th>Pt</th>
+        </tr></thead><tbody>`;
     group.forEach((team, rank) => {
       const isQual = QUAL[i] && QUAL[i].some(q => q && q.toLowerCase() === team.t.toLowerCase());
       const crest = CRESTS[team.t] ? `<img src="${CRESTS[team.t]}" class="standing-crest">` : '';
-      html += `<div class="standing-row${isQual ? ' qual' : ''}">
-        <span class="standing-pos">${rank+1}</span>
-        ${crest}
-        <span class="standing-team">${team.t}</span>
-        <span class="standing-stats">${team.pld}G ${team.gf}-${team.ga}</span>
-        <span class="standing-pts">${team.pts}pt</span>
-      </div>`;
+      const dr = team.gf - team.gs;
+      const drStr = dr > 0 ? `+${dr}` : `${dr}`;
+      html += `<tr class="${isQual ? 'st-qual' : ''}">
+        <td class="st-pos">${rank+1}</td>
+        <td>${crest}</td>
+        <td class="st-name">${team.t}</td>
+        <td>${team.pg}</td><td>${team.v}</td><td>${team.n}</td><td>${team.s}</td>
+        <td>${team.gf}</td><td>${team.gs}</td>
+        <td class="st-dr">${drStr}</td>
+        <td class="st-pts">${team.pt}</td>
+      </tr>`;
     });
-    html += '</div>';
+    html += '</tbody></table></div>';
   });
   html += '</div>';
   wrap.innerHTML = html;

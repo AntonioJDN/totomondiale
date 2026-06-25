@@ -103,15 +103,19 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 /* STANDINGS GIRONI */
 .standings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
 @media(max-width:700px){.standings-grid{grid-template-columns:1fr}}
-.standing-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px}
+.standing-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;overflow:hidden}
 .standing-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
-.standing-row{display:flex;align-items:center;gap:5px;padding:3px 4px;border-radius:4px;font-size:11px}
-.standing-row.qual{background:#eaf5ec}
-.standing-pos{min-width:14px;color:var(--muted);font-size:10px;font-weight:600}
-.standing-crest{width:14px;height:14px;object-fit:contain;flex-shrink:0}
-.standing-team{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
-.standing-stats{font-size:10px;color:var(--muted);white-space:nowrap}
-.standing-pts{font-weight:700;min-width:24px;text-align:right;font-size:11px}
+.standing-table{width:100%;border-collapse:collapse;font-size:10px}
+.standing-table thead th{color:var(--muted);font-weight:600;text-align:center;padding:2px 3px;border-bottom:1px solid var(--border);white-space:nowrap}
+.standing-table thead th.st-name{text-align:left}
+.standing-table td{text-align:center;padding:2px 3px;border-bottom:1px solid var(--border)}
+.standing-table tbody tr:last-child td{border-bottom:none}
+.standing-table tr.st-qual td{background:#eaf5ec}
+.st-name{text-align:left!important;font-weight:500;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-pos{color:var(--muted);font-size:9px}
+.st-pts{font-weight:700}
+.st-dr{color:var(--muted);font-size:9px}
+.standing-crest{width:12px;height:12px;object-fit:contain;vertical-align:middle}
 .girone-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:9px 11px}
 .girone-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
 .girone-teams-ro{display:flex;flex-direction:column;gap: 4px;margin-top:4px}

@@ -94,6 +94,22 @@ MT3 = [
     "Algeria-Austria"
 ]
 
+# Squadre per girone (nomi italiani) — specchio di GROUPS_TEAMS in index.html
+GROUPS_TEAMS_IT = [
+    ["Messico", "Sud Africa", "Corea", "Rep.Ceca"],     # A
+    ["Canada", "Bosnia", "Qatar", "Svizzera"],            # B
+    ["Brasile", "Marocco", "Haiti", "Scozia"],            # C
+    ["USA", "Paraguay", "Australia", "Turchia"],          # D
+    ["Germania", "C.Avorio", "Ecuador", "Curacao"],       # E
+    ["Olanda", "Giappone", "Svezia", "Tunisia"],          # F
+    ["Belgio", "Egitto", "Iran", "N.Zelanda"],            # G
+    ["Spagna", "Uruguay", "Arabia", "C.Verde"],           # H
+    ["Francia", "Senegal", "Norvegia", "Iraq"],           # I
+    ["Argentina", "Algeria", "Austria", "Giordania"],     # J
+    ["Portogallo", "Colombia", "Uzbekistan", "Dr Congo"], # K
+    ["Inghilterra", "Croazia", "Ghana", "Panama"],        # L
+]
+
 
 def fetch_matches():
     url = 'https://api.football-data.org/v4/competitions/WC/matches?season=2026'
@@ -106,57 +122,48 @@ def fetch_matches():
         sys.exit(1)
 
 
-def fetch_standings():
-    url = 'https://api.football-data.org/v4/competitions/WC/standings?season=2026'
-    req = urllib.request.Request(url, headers={'X-Auth-Token': API_KEY})
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            return json.loads(resp.read())
-    except Exception as e:
-        print(f"Errore fetch standings: {e}", file=sys.stderr)
-        return None
+def build_standings_from_matches(data):
+    """Calcola classifiche per girone dai match GROUP_STAGE già fetchati."""
+    team_to_group = {}
+    for i, group_teams in enumerate(GROUPS_TEAMS_IT):
+        for t in group_teams:
+            team_to_group[t] = i
 
+    stats = {}
+    for i, group_teams in enumerate(GROUPS_TEAMS_IT):
+        for t in group_teams:
+            stats[(i, t)] = {'pt': 0, 'pg': 0, 'v': 0, 'n': 0, 's': 0, 'gf': 0, 'gs': 0}
 
-def build_standings(data):
-    """Costruisce array di 12 gruppi ordinati per posizione."""
-    if not data:
-        return None
-    group_map = {f"GROUP_{chr(65+i)}": i for i in range(12)}
-    result = [None] * 12
-    all_entries = data.get('standings', [])
-    print(f"  Standings entries: {len(all_entries)}", file=sys.stderr)
-    for entry in all_entries:
-        print(f"  type={entry.get('type')} group={entry.get('group')} stage={entry.get('stage')}", file=sys.stderr)
-        if entry.get('type') == 'TOTAL':
-            table = entry.get('table', [])
-            print(f"  table rows: {len(table)}", file=sys.stderr)
-            for row in table[:6]:
-                print(f"    {row}", file=sys.stderr)
-    for entry in all_entries:
-        if entry.get('type') != 'TOTAL':
+    for m in data.get('matches', []):
+        if m.get('stage') != 'GROUP_STAGE' or m.get('status') != 'FINISHED':
             continue
-        group = entry.get('group', '')
-        idx = group_map.get(group)
-        if idx is None:
-            print(f"  [STANDINGS] gruppo non mappato: {group!r}", file=sys.stderr)
+        home_it = TEAM_MAP.get(m['homeTeam']['name'], m['homeTeam']['name'])
+        away_it = TEAM_MAP.get(m['awayTeam']['name'], m['awayTeam']['name'])
+        score = m.get('score', {}).get('fullTime', {})
+        hg, ag = score.get('home'), score.get('away')
+        if hg is None or ag is None:
             continue
-        table = []
-        for row in entry.get('table', []):
-            name_api = row['team']['name']
-            name_it = TEAM_MAP.get(name_api, name_api)
-            if name_it == name_api and name_api not in TEAM_MAP:
-                print(f"  [STANDINGS UNMAPPED] {name_api}", file=sys.stderr)
-            table.append({
-                't': name_it,
-                'pts': row['points'],
-                'pld': row['playedGames'],
-                'w': row['won'],
-                'd': row['draw'],
-                'l': row['lost'],
-                'gf': row['goalsFor'],
-                'ga': row['goalsAgainst'],
-            })
-        result[idx] = table
+        gi = team_to_group.get(home_it)
+        if gi is None:
+            continue
+        kh, ka = (gi, home_it), (gi, away_it)
+        if kh not in stats or ka not in stats:
+            continue
+        stats[kh]['pg'] += 1; stats[kh]['gf'] += hg; stats[kh]['gs'] += ag
+        stats[ka]['pg'] += 1; stats[ka]['gf'] += ag; stats[ka]['gs'] += hg
+        if hg > ag:
+            stats[kh]['v'] += 1; stats[kh]['pt'] += 3; stats[ka]['s'] += 1
+        elif hg == ag:
+            stats[kh]['n'] += 1; stats[kh]['pt'] += 1
+            stats[ka]['n'] += 1; stats[ka]['pt'] += 1
+        else:
+            stats[ka]['v'] += 1; stats[ka]['pt'] += 3; stats[kh]['s'] += 1
+
+    result = []
+    for i, group_teams in enumerate(GROUPS_TEAMS_IT):
+        group_list = [{'t': t, **stats.get((i, t), {'pt':0,'pg':0,'v':0,'n':0,'s':0,'gf':0,'gs':0})} for t in group_teams]
+        group_list.sort(key=lambda x: (-x['pt'], -(x['gf']-x['gs']), -x['gf']))
+        result.append(group_list)
     return result
 
 
@@ -355,14 +362,10 @@ if __name__ == '__main__':
     crests = build_crests(data)
     print(f"Loghi squadre trovati: {len(crests)}")
 
-    print("\nFetching standings...")
-    standings_data = fetch_standings()
-    standings = build_standings(standings_data)
-    if standings:
-        filled = sum(1 for g in standings if g)
-        print(f"Gironi con standings: {filled}/12")
-    else:
-        print("Standings non disponibili")
+    print("\nCalcolo standings dai match...")
+    standings = build_standings_from_matches(data)
+    active = sum(1 for g in standings if any(t['pg'] > 0 for t in g))
+    print(f"Gironi con partite giocate: {active}/12")
 
     update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings)
     print("\nindex.html aggiornato.")
