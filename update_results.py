@@ -127,6 +127,11 @@ def build_standings(data):
     print(f"  Standings entries: {len(all_entries)}", file=sys.stderr)
     for entry in all_entries:
         print(f"  type={entry.get('type')} group={entry.get('group')} stage={entry.get('stage')}", file=sys.stderr)
+        if entry.get('type') == 'TOTAL':
+            table = entry.get('table', [])
+            print(f"  table rows: {len(table)}", file=sys.stderr)
+            for row in table[:6]:
+                print(f"    {row}", file=sys.stderr)
     for entry in all_entries:
         if entry.get('type') != 'TOTAL':
             continue
