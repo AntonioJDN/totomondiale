@@ -123,12 +123,17 @@ def build_standings(data):
         return None
     group_map = {f"GROUP_{chr(65+i)}": i for i in range(12)}
     result = [None] * 12
-    for entry in data.get('standings', []):
+    all_entries = data.get('standings', [])
+    print(f"  Standings entries: {len(all_entries)}", file=sys.stderr)
+    for entry in all_entries:
+        print(f"  type={entry.get('type')} group={entry.get('group')} stage={entry.get('stage')}", file=sys.stderr)
+    for entry in all_entries:
         if entry.get('type') != 'TOTAL':
             continue
         group = entry.get('group', '')
         idx = group_map.get(group)
         if idx is None:
+            print(f"  [STANDINGS] gruppo non mappato: {group!r}", file=sys.stderr)
             continue
         table = []
         for row in entry.get('table', []):
