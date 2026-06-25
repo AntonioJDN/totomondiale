@@ -95,6 +95,7 @@
 
 <!-- GIRONI -->
 <div id="tab-gironi" class="tab-content">
+  <div id="standings-wrap"></div>
   <div class="info-bar"><span class="info-dot"></span>1 pt = una qualificata indovinata · 3 pt = entrambe indovinate (ordine non conta)</div>
   <div class="gwrap"><table class="gtable" id="gtable"></table></div>
 </div>
@@ -138,6 +139,9 @@ const CRESTS = {"Algeria":"https://crests.football-data.org/algeria.svg","Arabia
 
 // Qualificate per girone: [squadra1, squadra2] o null
 let QUAL = [["Messico","Sud Africa"],["Svizzera","Canada"],["Brasile","Marocco"],["USA",null],["Germania",null],null,null,null,["Francia","Norvegia"],["Argentina",null],["Colombia",null],null];
+
+// Classifiche gironi — aggiornate da GitHub Actions
+const STANDINGS = null;
 
 // Sedicesimi — nascosti finché SHOW_S4 = false
 const SHOW_S4 = false;
@@ -417,8 +421,33 @@ function renderAll() {
   renderInputs();
   renderSchedine();
   renderGironi();
+  renderStandings();
   renderStats();
   updateMeta();
+}
+
+function renderStandings() {
+  const wrap = document.getElementById('standings-wrap');
+  if (!STANDINGS || !STANDINGS.length) { wrap.innerHTML = ''; return; }
+  let html = '<div class="standings-grid">';
+  STANDINGS.forEach((group, i) => {
+    if (!group || !group.length) return;
+    html += `<div class="standing-card"><div class="standing-label">Girone ${GIRONI_LABELS[i]}</div>`;
+    group.forEach((team, rank) => {
+      const isQual = QUAL[i] && QUAL[i].some(q => q && q.toLowerCase() === team.t.toLowerCase());
+      const crest = CRESTS[team.t] ? `<img src="${CRESTS[team.t]}" class="standing-crest">` : '';
+      html += `<div class="standing-row${isQual ? ' qual' : ''}">
+        <span class="standing-pos">${rank+1}</span>
+        ${crest}
+        <span class="standing-team">${team.t}</span>
+        <span class="standing-stats">${team.pld}G ${team.gf}-${team.ga}</span>
+        <span class="standing-pts">${team.pts}pt</span>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
 }
 
 

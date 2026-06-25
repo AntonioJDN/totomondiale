@@ -106,6 +106,50 @@ def fetch_matches():
         sys.exit(1)
 
 
+def fetch_standings():
+    url = 'https://api.football-data.org/v4/competitions/WC/standings?season=2026'
+    req = urllib.request.Request(url, headers={'X-Auth-Token': API_KEY})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read())
+    except Exception as e:
+        print(f"Errore fetch standings: {e}", file=sys.stderr)
+        return None
+
+
+def build_standings(data):
+    """Costruisce array di 12 gruppi ordinati per posizione."""
+    if not data:
+        return None
+    group_map = {f"GROUP_{chr(65+i)}": i for i in range(12)}
+    result = [None] * 12
+    for entry in data.get('standings', []):
+        if entry.get('type') != 'TOTAL':
+            continue
+        group = entry.get('group', '')
+        idx = group_map.get(group)
+        if idx is None:
+            continue
+        table = []
+        for row in entry.get('table', []):
+            name_api = row['team']['name']
+            name_it = TEAM_MAP.get(name_api, name_api)
+            if name_it == name_api and name_api not in TEAM_MAP:
+                print(f"  [STANDINGS UNMAPPED] {name_api}", file=sys.stderr)
+            table.append({
+                't': name_it,
+                'pts': row['points'],
+                'pld': row['playedGames'],
+                'w': row['won'],
+                'd': row['draw'],
+                'l': row['lost'],
+                'gf': row['goalsFor'],
+                'ga': row['goalsAgainst'],
+            })
+        result[idx] = table
+    return result
+
+
 def build_lookup(data):
     """Costruisce dizionario {Casa-Ospite: {result, score, date}} dai dati API.
     Indicizza entrambi gli ordini (Casa-Ospite e Ospite-Casa) per resistere
@@ -227,7 +271,7 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
     return R, SC, DT
 
 
-def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests):
+def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings=None):
     with open(INDEX_FILE, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -256,6 +300,13 @@ def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests):
     content, n = re.subn(r'const CRESTS = \{[^}]*\};', new_crests, content)
     if n == 0:
         print("WARN: CRESTS non trovato in index.html", file=sys.stderr)
+
+    # Aggiorna STANDINGS
+    if standings is not None:
+        standings_json = json.dumps(standings, ensure_ascii=False, separators=(',', ':'))
+        content, n = re.subn(r'const STANDINGS = [^\n]*;', f'const STANDINGS = {standings_json};', content)
+        if n == 0:
+            print("WARN: STANDINGS non trovato in index.html", file=sys.stderr)
 
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -294,5 +345,14 @@ if __name__ == '__main__':
     crests = build_crests(data)
     print(f"Loghi squadre trovati: {len(crests)}")
 
-    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests)
+    print("\nFetching standings...")
+    standings_data = fetch_standings()
+    standings = build_standings(standings_data)
+    if standings:
+        filled = sum(1 for g in standings if g)
+        print(f"Gironi con standings: {filled}/12")
+    else:
+        print("Standings non disponibili")
+
+    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings)
     print("\nindex.html aggiornato.")
