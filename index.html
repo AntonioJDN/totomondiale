@@ -74,7 +74,7 @@
       <div class="match-inputs" id="input-t3"></div>
     </div>
     <div class="input-section">
-      <h3>Sedicesimi <span id="lbl-t4">0/16 giocate</span></h3>
+      <h3>Sedicesimi <span id="lbl-t4">0/13 giocate</span></h3>
       <div class="match-inputs" id="input-t4"></div>
     </div>
   </div>
@@ -151,26 +151,23 @@ const STANDINGS = [[{"t":"Messico","pt":9,"pg":3,"v":3,"n":0,"s":0,"gf":6,"gs":0
 const SHOW_S4 = false;
 const S4_ENC = ""; // predizioni base64-encoded, inserite man mano
 let MT4 = [
-  "Sud Africa-Canada",   // M73 28/06 SoFi Stadium LA
-  "Germania-N.D.",       // M74 29/06 Gillette Stadium Boston
-  "Olanda-Marocco",      // M75 29/06 Estadio BBVA Monterrey
-  "Brasile-Giappone",    // M76 29/06 NRG Stadium Houston
+  "Olanda-Marocco",      // M75 30/06 Estadio BBVA Monterrey
   "Francia-N.D.",        // M77 30/06 MetLife Stadium NY/NJ
   "C.Avorio-Norvegia",   // M78 30/06 AT&T Stadium Dallas
   "Messico-N.D.",        // M79 30/06 Estadio Azteca Città del Messico
   "N.D.-N.D.",           // M80 01/07 Mercedes-Benz Stadium Atlanta
-  "USA-N.D.",            // M81 01/07 Levi's Stadium San Francisco
+  "USA-N.D.",            // M81 02/07 Levi's Stadium San Francisco
   "N.D.-N.D.",           // M82 01/07 Lumen Field Seattle
-  "N.D.-N.D.",           // M83 02/07 BMO Field Toronto
+  "N.D.-N.D.",           // M83 03/07 BMO Field Toronto
   "N.D.-N.D.",           // M84 02/07 SoFi Stadium LA
-  "Svizzera-N.D.",       // M85 02/07 BC Place Vancouver
+  "Svizzera-N.D.",       // M85 03/07 BC Place Vancouver
   "Argentina-N.D.",      // M86 03/07 Hard Rock Stadium Miami
-  "Colombia-N.D.",       // M87 03/07 Arrowhead Stadium Kansas City
+  "Colombia-N.D.",       // M87 04/07 Arrowhead Stadium Kansas City
   "Australia-N.D.",      // M88 03/07 AT&T Stadium Dallas
 ];
-let R4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
-const SC4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
-let DT4 = ["28/06 - 21","29/06 - 22:30","30/06 - 03","29/06 - 19","30/06 - 23","30/06 - 19","01/07 - 03","01/07 - 18","02/07 - 02","01/07 - 22","03/07 - 01","02/07 - 21","03/07 - 05","04/07 - 00","04/07 - 03:30","03/07 - 20"];
+let R4 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
+const SC4 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
+let DT4 = ["30/06 - 03","30/06 - 23","30/06 - 19","01/07 - 03","01/07 - 18","02/07 - 02","01/07 - 22","03/07 - 01","02/07 - 21","03/07 - 05","04/07 - 00","04/07 - 03:30","03/07 - 20"];
 
 function getS4() {
   if (!S4_ENC) return [];
@@ -786,7 +783,7 @@ function updateMeta() {
   document.getElementById('t3d').textContent = R3.filter(Boolean).length;
   document.getElementById('lbl-t2').textContent = R2.filter(Boolean).length+'/13 giocate';
   document.getElementById('lbl-t3').textContent = R3.filter(Boolean).length+'/13 giocate';
-  document.getElementById('lbl-t4').textContent = R4.filter(Boolean).length+'/16 giocate';
+  document.getElementById('lbl-t4').textContent = R4.filter(Boolean).length+'/13 giocate';
   const girDone = QUAL.filter(q=>q&&q[0]).length;
   document.getElementById('lbl-gir').textContent = girDone+'/12 gironi inseriti';
   document.getElementById('last-update').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
