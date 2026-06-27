@@ -627,7 +627,22 @@ function renderInputs() {
   document.getElementById('input-t1').innerHTML = MT1.map((m,i) => matchRow(m,i,R1,SC1)).join('');
   document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2)).join('');
   document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,SC3)).join('');
-  document.getElementById('input-t4').innerHTML = MT4.map((m,i) => matchRow(m,i,R4,SC4)).join('');
+  const matchRowT4 = (m, i) => {
+    const rawScore = SC4[i] ? (SC4[i].match(/\d+-\d+/)||[''])[0] : '';
+    const res = R4[i];
+    const score = rawScore ? `<span class="match-score">${rawScore}</span>` : '';
+    const tagCls = res==='1'?'tag-1':res==='X'?'tag-X':res==='2'?'tag-2':'';
+    const tag = res ? `<span class="tag ${tagCls}">${res}</span>` : `<span class="res-nd">—</span>`;
+    const dashIdx = m.indexOf('-');
+    const home = dashIdx >= 0 ? m.slice(0, dashIdx) : m;
+    const away = dashIdx >= 0 ? m.slice(dashIdx + 1) : '';
+    const homeC = CRESTS[home] ? `<img src="${CRESTS[home]}" class="team-crest" style="width:14px;height:14px;margin-right:2px;vertical-align:middle">` : '';
+    const awayC = CRESTS[away] ? `<img src="${CRESTS[away]}" class="team-crest" style="width:14px;height:14px;margin-right:2px;vertical-align:middle">` : '';
+    const dt = DT4[i];
+    const dateStr = !res && dt ? `<span class="match-dt">${dt}</span>` : '';
+    return `<div class="match-row"><span class="match-label">${homeC}${home} - ${awayC}${away}</span>${dateStr}${score}${tag}</div>`;
+  };
+  document.getElementById('input-t4').innerHTML = MT4.map((m,i) => matchRowT4(m,i)).join('');
   // Gironi read-only
   document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => {
     const sel = QUAL[i] || [];
@@ -677,7 +692,7 @@ function renderSchedine() {
   MT1.forEach((m,i) => html += matchTh(m, R1[i], SC1[i], DT1[i], 'h1'));
   MT2.forEach((m,i) => html += matchTh(m, R2[i], SC2[i], DT2[i], 'h2'));
   MT3.forEach((m,i) => html += matchTh(m, R3[i], SC3[i], DT3[i], 'h3'));
-  if (SHOW_S4 && MT4.length > 0) {
+  if (MT4.length > 0) {
     MT4.forEach((m,i) => html += matchTh(m, R4[i], SC4[i], DT4[i], 'h4'));
   }
   html += '<th class="ptd-h">Pt</th>';
@@ -700,8 +715,8 @@ function renderSchedine() {
       const cls = !r?'nd':(p===r?'ok':'no');
       html += `<td class="${cls}">${p||'—'}</td>`;
     });
-    // S4: visibile solo se SHOW_S4; per partite non ancora giocate mostra "?"
-    if (SHOW_S4 && MT4.length > 0) {
+    // S4: colonne sempre visibili; pronostico rivelato solo dopo il risultato
+    if (MT4.length > 0) {
       const s4data = getS4();
       const ss4 = s4data.find(s=>s.n===name);
       MT4.forEach((_,i) => {
