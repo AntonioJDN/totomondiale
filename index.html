@@ -73,6 +73,10 @@
       <h3>Turno 3 <span id="lbl-t3">0/13 giocate — partite da definire</span></h3>
       <div class="match-inputs" id="input-t3"></div>
     </div>
+    <div class="input-section">
+      <h3>Sedicesimi <span id="lbl-t4">0/16 giocate</span></h3>
+      <div class="match-inputs" id="input-t4"></div>
+    </div>
   </div>
   <div class="input-section">
     <h3>Gironi <span id="lbl-gir">qualificate da inserire</span></h3>
@@ -146,10 +150,27 @@ const STANDINGS = [[{"t":"Messico","pt":9,"pg":3,"v":3,"n":0,"s":0,"gf":6,"gs":0
 // Sedicesimi — nascosti finché SHOW_S4 = false
 const SHOW_S4 = false;
 const S4_ENC = ""; // predizioni base64-encoded, inserite man mano
-let MT4 = []; // partite sedicesimi (da riempire quando note)
+let MT4 = [
+  "Sud Africa-Canada",   // M73 28/06 SoFi Stadium LA
+  "Germania-N.D.",       // M74 29/06 Gillette Stadium Boston
+  "Olanda-Marocco",      // M75 29/06 Estadio BBVA Monterrey
+  "Brasile-Giappone",    // M76 29/06 NRG Stadium Houston
+  "Francia-N.D.",        // M77 30/06 MetLife Stadium NY/NJ
+  "C.Avorio-Norvegia",   // M78 30/06 AT&T Stadium Dallas
+  "Messico-N.D.",        // M79 30/06 Estadio Azteca Città del Messico
+  "N.D.-N.D.",           // M80 01/07 Mercedes-Benz Stadium Atlanta
+  "USA-N.D.",            // M81 01/07 Levi's Stadium San Francisco
+  "N.D.-N.D.",           // M82 01/07 Lumen Field Seattle
+  "N.D.-N.D.",           // M83 02/07 BMO Field Toronto
+  "N.D.-N.D.",           // M84 02/07 SoFi Stadium LA
+  "Svizzera-N.D.",       // M85 02/07 BC Place Vancouver
+  "Argentina-N.D.",      // M86 03/07 Hard Rock Stadium Miami
+  "Colombia-N.D.",       // M87 03/07 Arrowhead Stadium Kansas City
+  "Australia-N.D.",      // M88 03/07 AT&T Stadium Dallas
+];
 let R4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
 const SC4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
-let DT4 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+let DT4 = ["28/06","29/06","29/06","29/06","30/06","30/06","30/06","01/07","01/07","01/07","02/07","02/07","02/07","03/07","03/07","03/07"];
 
 function getS4() {
   if (!S4_ENC) return [];
@@ -272,7 +293,7 @@ const S3 = [
   {n:"andrea De Angelis",p:["X","1","2","2","2","2","1","2","2","2","1","2","X"]},
   {n:"enzo e bast",p:["X","X","1","1","2","X","X","2","X","X","1","2","X"]},
   {n:"Antonio Imela",p:["X","1","2","2","2","2","1","X","X","2","1","2","2"]},
-  {n:"Sasycasty",p:["X","1","2","2","2","2","1","2","X","2","1","1","2"]},
+  {n:"Sasycasty",p:["X","1","2","2","2","2","1","2","X","2","1","X","2"]},
   {n:"Gallaratesi !",p:["X","2","X","X","2","2","1","X","2","2","X","2","X"]},
   {n:"Mariano petrucci",p:["2","X","X","2","1","2","1","2","X","X","1","1","X"]},
   {n:"Renato Amatori",p:["X","1","2","2","2","X","1","1","X","2","1","X","1"]},
@@ -606,6 +627,7 @@ function renderInputs() {
   document.getElementById('input-t1').innerHTML = MT1.map((m,i) => matchRow(m,i,R1,SC1)).join('');
   document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2)).join('');
   document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,SC3)).join('');
+  document.getElementById('input-t4').innerHTML = MT4.map((m,i) => matchRow(m,i,R4,SC4)).join('');
   // Gironi read-only
   document.getElementById('input-gironi').innerHTML = GIRONI_LABELS.map((g,i) => {
     const sel = QUAL[i] || [];
@@ -749,6 +771,7 @@ function updateMeta() {
   document.getElementById('t3d').textContent = R3.filter(Boolean).length;
   document.getElementById('lbl-t2').textContent = R2.filter(Boolean).length+'/13 giocate';
   document.getElementById('lbl-t3').textContent = R3.filter(Boolean).length+'/13 giocate';
+  document.getElementById('lbl-t4').textContent = R4.filter(Boolean).length+'/16 giocate';
   const girDone = QUAL.filter(q=>q&&q[0]).length;
   document.getElementById('lbl-gir').textContent = girDone+'/12 gironi inseriti';
   document.getElementById('last-update').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
