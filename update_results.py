@@ -55,6 +55,7 @@ TEAM_MAP = {
     'Uruguay':                  'Uruguay',
     'Saudi Arabia':             'Arabia',
     'Cape Verde':               'C.Verde',
+    'Cape Verde Islands':       'C.Verde',
     'France':                   'Francia',
     'Senegal':                  'Senegal',
     'Norway':                   'Norvegia',
@@ -325,8 +326,46 @@ def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings=None
         if n == 0:
             print("WARN: STANDINGS non trovato in index.html", file=sys.stderr)
 
+    # Aggiorna QUAL automaticamente per gironi completati (tutti pg=3)
+    if standings is not None:
+        content = auto_update_qual(content, standings)
+
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         f.write(content)
+
+
+def auto_update_qual(content, standings):
+    """Per ogni girone con tutte le partite giocate, aggiorna QUAL con le prime 2."""
+    m = re.search(r'let QUAL = (.+);', content)
+    if not m:
+        print("WARN: QUAL non trovato per auto-update", file=sys.stderr)
+        return content
+    try:
+        qual = json.loads(m.group(1))
+    except Exception as e:
+        print(f"WARN: QUAL parse error: {e}", file=sys.stderr)
+        return content
+
+    updated = 0
+    for i, group in enumerate(standings):
+        if not group or len(group) < 2:
+            continue
+        if all(t['pg'] == 3 for t in group):
+            new_val = [group[0]['t'], group[1]['t']]
+            if qual[i] != new_val:
+                qual[i] = new_val
+                updated += 1
+
+    if updated:
+        def to_js(v):
+            if v is None: return 'null'
+            if isinstance(v, list): return '[' + ','.join(to_js(x) for x in v) + ']'
+            return f'"{v}"'
+        new_qual = 'let QUAL = ' + to_js(qual) + ';'
+        content = re.sub(r'let QUAL = .+;', new_qual, content)
+        print(f"  QUAL aggiornato per {updated} girone/i")
+
+    return content
 
 
 if __name__ == '__main__':
