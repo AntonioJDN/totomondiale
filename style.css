@@ -79,7 +79,7 @@ span.match-score{padding-right:8px;border-right:2px solid #dbdbdb;font-weight:60
 .s16-card{display:flex;align-items:center;gap:6px;padding:10px 12px;border:2px solid #dbdbdb;border-radius:16px;min-width:0}
 .s16-team{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
 .s16-home{justify-content:flex-end;flex-direction:row-reverse}
-.s16-away{justify-content:flex-start}
+.s16-away{justify-content:flex-end}
 .s16-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .s16-crest{width:20px;height:20px;object-fit:contain;flex-shrink:0}
 .s16-center{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:62px;text-align:center}
