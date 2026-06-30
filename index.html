@@ -59,7 +59,10 @@
 <!-- INSERISCI -->
 <div id="tab-inserisci" class="tab-content">
   <div class="info-bar"><span class="info-dot"></span>Risultati aggiornati automaticamente ogni ora</div>
-  <div class="stats-grid" id="stats-grid" style="margin-bottom:.8rem"></div>
+  <div class="input-section s16-section">
+    <h3>Sedicesimi <span id="lbl-t4">0/13 giocate</span></h3>
+    <div class="s16-grid" id="input-t4"></div>
+  </div>
   <div class="input-turni">
     <div class="input-section">
       <h3>Turno 1 <span>13/13 giocate</span></h3>
@@ -72,10 +75,6 @@
     <div class="input-section">
       <h3>Turno 3 <span id="lbl-t3">0/13 giocate — partite da definire</span></h3>
       <div class="match-inputs" id="input-t3"></div>
-    </div>
-    <div class="input-section">
-      <h3>Sedicesimi <span id="lbl-t4">0/13 giocate</span></h3>
-      <div class="match-inputs" id="input-t4"></div>
     </div>
   </div>
   <div class="input-section">
@@ -483,7 +482,6 @@ function renderAll() {
   renderSchedine();
   renderGironi();
   renderStandings();
-  renderStats();
   updateMeta();
 }
 
@@ -670,17 +668,21 @@ function renderInputs() {
   const matchRowT4 = (m, i) => {
     const rawScore = SC4[i] ? (SC4[i].match(/\d+-\d+/)||[''])[0] : '';
     const res = R4[i];
-    const score = rawScore ? `<span class="match-score">${rawScore}</span>` : '';
     const tagCls = res==='1'?'tag-1':res==='X'?'tag-X':res==='2'?'tag-2':'';
-    const tag = res ? `<span class="tag ${tagCls}">${res}</span>` : `<span class="res-nd">—</span>`;
+    const tag = res ? `<span class="tag ${tagCls}">${res}</span>` : '';
+    const score = rawScore ? `<div class="s16-score">${rawScore}</div>` : '';
+    const dt = DT4[i];
+    const dateStr = dt ? `<div class="s16-dt">${dt}</div>` : '';
     const dashIdx = m.indexOf('-');
     const home = dashIdx >= 0 ? m.slice(0, dashIdx) : m;
     const away = dashIdx >= 0 ? m.slice(dashIdx + 1) : '';
-    const homeC = CRESTS[home] ? `<img src="${CRESTS[home]}" class="team-crest" style="width:14px;height:14px;margin-right:2px;vertical-align:middle">` : '';
-    const awayC = CRESTS[away] ? `<img src="${CRESTS[away]}" class="team-crest" style="width:14px;height:14px;margin-right:2px;vertical-align:middle">` : '';
-    const dt = DT4[i];
-    const dateStr = !res && dt ? `<span class="match-dt">${dt}</span>` : '';
-    return `<div class="match-row"><span class="match-label">${homeC}${home} - ${awayC}${away}</span>${dateStr}${score}${tag}</div>`;
+    const homeC = CRESTS[home] ? `<img src="${CRESTS[home]}" class="s16-crest">` : '';
+    const awayC = CRESTS[away] ? `<img src="${CRESTS[away]}" class="s16-crest">` : '';
+    return `<div class="s16-card">
+      <div class="s16-team s16-home">${homeC}<span class="s16-name">${home}</span></div>
+      <div class="s16-center">${dateStr}${score}${tag}</div>
+      <div class="s16-team s16-away"><span class="s16-name">${away}</span>${awayC}</div>
+    </div>`;
   };
   document.getElementById('input-t4').innerHTML = MT4.map((m,i) => matchRowT4(m,i)).join('');
   // Gironi read-only
