@@ -185,6 +185,9 @@ def build_lookup(data):
     for m in data.get('matches', []):
         home_api = m['homeTeam']['name']
         away_api = m['awayTeam']['name']
+        # Salta partite con team TBD (nomi null = knockout non ancora determinati)
+        if home_api is None or away_api is None:
+            continue
         home_it = TEAM_MAP.get(home_api, home_api)
         away_it = TEAM_MAP.get(away_api, away_api)
         # Log squadre non mappate (per debug)
@@ -237,6 +240,8 @@ def build_crests(data):
         for team_key in ['homeTeam', 'awayTeam']:
             t = m[team_key]
             name_api = t.get('name', '')
+            if not name_api:
+                continue
             name_it = TEAM_MAP.get(name_api, name_api)
             crest = t.get('crest', '')
             if crest:
