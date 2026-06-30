@@ -94,6 +94,12 @@ MT3 = [
     "Norvegia-Francia", "Uruguay-Spagna", "Egitto-Iran", "Colombia-Portogallo",
     "Algeria-Austria"
 ]
+MT4 = [
+    "Olanda-Marocco", "C.Avorio-Norvegia", "Francia-Svezia", "Messico-Ecuador",
+    "Inghilterra-Dr Congo", "Belgio-Senegal", "USA-Bosnia", "Spagna-Austria",
+    "Portogallo-Croazia", "Svizzera-Algeria", "Australia-Egitto",
+    "Argentina-C.Verde", "Colombia-Ghana"
+]
 
 # Squadre per girone (nomi italiani) — specchio di GROUPS_TEAMS in index.html
 GROUPS_TEAMS_IT = [
@@ -289,7 +295,7 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
     return R, SC, DT
 
 
-def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings=None):
+def update_html(r1, sc1, r2, sc2, r3, sc3, r4, sc4, dt1, dt2, dt3, dt4, crests, standings=None):
     with open(INDEX_FILE, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -305,12 +311,15 @@ def update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings=None
     content = replace_var(content, 'R1', r1, let=True)
     content = replace_var(content, 'R2', r2, let=True)
     content = replace_var(content, 'R3', r3, let=True)
+    content = replace_var(content, 'R4', r4, let=True)
     content = replace_var(content, 'SC1', sc1, let=False)
     content = replace_var(content, 'SC2', sc2, let=False)
     content = replace_var(content, 'SC3', sc3, let=False)
+    content = replace_var(content, 'SC4', sc4, let=False)
     content = replace_var(content, 'DT1', dt1, let=True)
     content = replace_var(content, 'DT2', dt2, let=True)
     content = replace_var(content, 'DT3', dt3, let=True)
+    content = replace_var(content, 'DT4', dt4, let=True)
 
     # Aggiorna CRESTS
     items = ','.join(f'"{k}":"{v}"' for k, v in sorted(crests.items()))
@@ -390,6 +399,8 @@ if __name__ == '__main__':
     existing_sc2 = parse_existing(current, 'SC2', let=False)
     existing_r3 = parse_existing(current, 'R3', let=True)
     existing_sc3 = parse_existing(current, 'SC3', let=False)
+    existing_r4 = parse_existing(current, 'R4', let=True)
+    existing_sc4 = parse_existing(current, 'SC4', let=False)
 
     print("\nT1:")
     r1, sc1, dt1 = build_arrays(MT1, lookup, existing_r1, existing_sc1)
@@ -397,6 +408,8 @@ if __name__ == '__main__':
     r2, sc2, dt2 = build_arrays(MT2, lookup, existing_r2, existing_sc2)
     print("\nT3:")
     r3, sc3, dt3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
+    print("\nT4 (Sedicesimi):")
+    r4, sc4, dt4 = build_arrays(MT4, lookup, existing_r4, existing_sc4)
 
     crests = build_crests(data)
     print(f"Loghi squadre trovati: {len(crests)}")
@@ -406,5 +419,5 @@ if __name__ == '__main__':
     active = sum(1 for g in standings if any(t['pg'] > 0 for t in g))
     print(f"Gironi con partite giocate: {active}/12")
 
-    update_html(r1, sc1, r2, sc2, r3, sc3, dt1, dt2, dt3, crests, standings)
+    update_html(r1, sc1, r2, sc2, r3, sc3, r4, sc4, dt1, dt2, dt3, dt4, crests, standings)
     print("\nindex.html aggiornato.")
