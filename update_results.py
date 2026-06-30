@@ -211,6 +211,9 @@ def build_lookup(data):
         entry_fwd = {'date': date_str}
         entry_rev = {'date': date_str}
 
+        # IMPORTANTE: usiamo SOLO fullTime (90 min).
+        # Extra time e rigori NON contano per il pronostico 1X2.
+        # Non usare mai m['score']['winner'] che riflette il vincitore finale.
         if status == 'FINISHED' and hs is not None and as_ is not None:
             if hs > as_:
                 result_fwd, result_rev = '1', '2'
@@ -218,8 +221,8 @@ def build_lookup(data):
                 result_fwd = result_rev = 'X'
             else:
                 result_fwd, result_rev = '2', '1'
-            entry_fwd.update({'result': result_fwd, 'score': f"{hs}-{as_}"})
-            entry_rev.update({'result': result_rev, 'score': f"{as_}-{hs}"})
+            entry_fwd.update({'result': result_fwd, 'score': f"{hs}-{as_} (90')"})
+            entry_rev.update({'result': result_rev, 'score': f"{as_}-{hs} (90')"})
 
         lookup[f"{home_it}-{away_it}"] = entry_fwd
         lookup[f"{away_it}-{home_it}"] = entry_rev
