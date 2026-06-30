@@ -266,10 +266,12 @@ def parse_existing(content, name, let=True):
     return result
 
 
-def build_arrays(match_names, lookup, existing_R, existing_SC):
+def build_arrays(match_names, lookup, existing_R, existing_SC, lock_existing=False):
     """
     Regola fondamentale: aggiorna solo se l'API restituisce FINISHED.
     Non sovrascrive mai un valore esistente con null.
+    Se lock_existing=True, i valori già presenti non vengono mai sovrascritti dall'API
+    (utile per i turni knockout dove i risultati vengono inseriti manualmente).
     Restituisce anche le date (DT) per ogni partita.
     """
     R = []
@@ -283,7 +285,11 @@ def build_arrays(match_names, lookup, existing_R, existing_SC):
         date_val = f'"{api["date"]}"' if api and api.get('date') else 'null'
         DT.append(date_val)
 
-        if api and api.get('result'):
+        if lock_existing and cur_r:
+            # Modalità manuale: mantieni sempre il valore esistente
+            R.append(f'"{cur_r}"')
+            SC.append(f'"{cur_sc}"' if cur_sc else 'null')
+        elif api and api.get('result'):
             # L'API ha un risultato confermato → aggiorna sempre
             R.append(f'"{api["result"]}"')
             SC.append(f'"{api["score"]}"')
@@ -417,7 +423,7 @@ if __name__ == '__main__':
     print("\nT3:")
     r3, sc3, dt3 = build_arrays(MT3, lookup, existing_r3, existing_sc3)
     print("\nT4 (Sedicesimi):")
-    r4, sc4, dt4 = build_arrays(MT4, lookup, existing_r4, existing_sc4)
+    r4, sc4, dt4 = build_arrays(MT4, lookup, existing_r4, existing_sc4, lock_existing=True)
 
     crests = build_crests(data)
     print(f"Loghi squadre trovati: {len(crests)}")
