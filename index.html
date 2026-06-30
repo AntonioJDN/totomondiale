@@ -647,22 +647,16 @@ function renderWinnerCard() {
   el.innerHTML = `
   <div class="winner-card">
     <div class="winner-trophy">🏆</div>
-    <div class="winner-body">
-      <div class="winner-label">${isTied ? 'In testa' : 'In testa'}</div>
-      <div class="winner-name">${isTied ? tied.map(r=>r.n).join(' · ') : w.n}</div>
-      <div class="winner-scores">
-        <div class="wscore-item"><span class="wscore-val">${w.t1}</span><span class="wscore-lbl">T1</span></div>
-        <div class="wscore-sep"></div>
-        <div class="wscore-item"><span class="wscore-val">${w.t2}</span><span class="wscore-lbl">T2</span></div>
-        <div class="wscore-sep"></div>
-        <div class="wscore-item"><span class="wscore-val">${w.t3}</span><span class="wscore-lbl">T3</span></div>
-        <div class="wscore-sep"></div>
-        <div class="wscore-item"><span class="wscore-val">${w.gir}</span><span class="wscore-lbl">Gir.</span></div>
-        <div class="wscore-sep"></div>
-        <div class="wscore-item"><span class="wscore-val">${w.t4}</span><span class="wscore-lbl">S16</span></div>
-      </div>
+    <div class="winner-label">${isTied ? 'In testa' : 'In testa'}</div>
+    <div class="winner-name">${isTied ? tied.map(r=>r.n).join(' · ') : w.n}</div>
+    <div class="winner-total-row"><span class="winner-total">${w.tot}</span><span class="winner-total-lbl">punti</span></div>
+    <div class="winner-scores">
+      <div class="wscore-box"><span class="wscore-val">${w.t1}</span><span class="wscore-lbl">Turno 1</span></div>
+      <div class="wscore-box"><span class="wscore-val">${w.t2}</span><span class="wscore-lbl">Turno 2</span></div>
+      <div class="wscore-box"><span class="wscore-val">${w.t3}</span><span class="wscore-lbl">Turno 3</span></div>
+      <div class="wscore-box"><span class="wscore-val">${w.gir}</span><span class="wscore-lbl">Gironi</span></div>
+      <div class="wscore-box"><span class="wscore-val">${w.t4}</span><span class="wscore-lbl">S16</span></div>
     </div>
-    <div class="winner-total">${w.tot}<span class="winner-total-lbl">pt</span></div>
   </div>`;
 }
 

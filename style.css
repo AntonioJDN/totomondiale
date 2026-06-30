@@ -37,19 +37,18 @@ input#sched-search {
 }
 
 /* WINNER CARD */
-.winner-card{display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,#0d2d6b 0%,#1a6bbf 60%,#4db8ff 100%);border-radius:20px;padding:1.4rem 1.8rem;margin-bottom:1rem;color:#fff;box-shadow:0 4px 20px rgba(13,45,107,.35)}
-.winner-trophy{font-size:2.8rem;line-height:1;flex-shrink:0}
-.winner-body{flex:1;min-width:0}
-.winner-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:2px}
-.winner-name{font-size:1.4rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-bottom:.8rem}
-.winner-scores{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.wscore-item{display:flex;flex-direction:column;align-items:center;gap:1px}
-.wscore-val{font-size:1.5rem;font-weight:800;line-height:1}
+.winner-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:linear-gradient(170deg,#0a1f5c 0%,#1251a8 50%,#2b8de0 100%);border-radius:24px;padding:2rem 1.5rem 1.8rem;margin-bottom:1.2rem;color:#fff;box-shadow:0 6px 28px rgba(10,31,92,.4)}
+.winner-trophy{font-size:4rem;line-height:1;margin-bottom:.5rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.winner-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;opacity:.6;margin-bottom:.3rem}
+.winner-name{font-size:1.9rem;font-weight:900;line-height:1.15;margin-bottom:.8rem;word-break:break-word}
+.winner-total-row{display:flex;align-items:baseline;gap:.3rem;margin-bottom:1.4rem}
+.winner-total{font-size:4rem;font-weight:900;line-height:1}
+.winner-total-lbl{font-size:1rem;font-weight:600;opacity:.65}
+.winner-scores{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.wscore-box{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:.7rem 1rem;min-width:62px;backdrop-filter:blur(4px)}
+.wscore-val{font-size:1.8rem;font-weight:900;line-height:1}
 .wscore-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;opacity:.65}
-.wscore-sep{width:1px;height:36px;background:rgba(255,255,255,.25);flex-shrink:0}
-.winner-total{font-size:3.2rem;font-weight:900;line-height:1;flex-shrink:0;text-align:right}
-.winner-total-lbl{font-size:.9rem;font-weight:600;opacity:.7;margin-left:3px}
-@media(max-width:600px){.winner-card{padding:1rem 1.2rem;gap:.8rem}.winner-trophy{font-size:2rem}.winner-total{font-size:2.2rem}.wscore-val{font-size:1.1rem}}
+@media(max-width:500px){.winner-name{font-size:1.4rem}.winner-total{font-size:3rem}.wscore-box{min-width:52px;padding:.5rem .7rem}.wscore-val{font-size:1.4rem}}
 
 /* CLASSIFICA */
 .rank-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
