@@ -149,6 +149,8 @@ const STANDINGS = [[{"t":"Messico","pt":9,"pg":3,"v":3,"n":0,"s":0,"gf":6,"gs":0
 
 // Sedicesimi — nascosti finché SHOW_S4 = false
 const SHOW_S4 = false;
+// Winner card — visibile solo quando il torneo è finito
+const SHOW_WINNER = false;
 const S4 = [
   {n:"Alexrsb",p:["X","2","1","1","1","2","X","1","X","2","2","1","X"]},
   {n:"sabino",p:["X","2","1","1","1","1","1","1","1","1","2","1","X"]},
@@ -639,6 +641,7 @@ function compRank(sorted, tot) {
 function renderWinnerCard() {
   const el = document.getElementById('winner-card');
   if (!el) return;
+  if (!SHOW_WINNER) { el.innerHTML = ''; return; }
   const sorted = buildRanking();
   if (!sorted.length) { el.innerHTML = ''; return; }
   const w = sorted[0];
@@ -647,7 +650,7 @@ function renderWinnerCard() {
   el.innerHTML = `
   <div class="winner-card">
     <div class="winner-trophy">🏆</div>
-    <div class="winner-label">${isTied ? 'In testa' : 'In testa'}</div>
+    <div class="winner-label">Vincitore</div>
     <div class="winner-name">${isTied ? tied.map(r=>r.n).join(' · ') : w.n}</div>
     <div class="winner-total-row"><span class="winner-total">${w.tot}</span><span class="winner-total-lbl">punti</span></div>
     <div class="winner-scores">
