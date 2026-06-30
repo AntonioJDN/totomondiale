@@ -45,6 +45,7 @@
 
 <!-- CLASSIFICA -->
 <div id="tab-classifica" class="tab-content active">
+  <div id="winner-card"></div>
   <div class="info-bar"><span class="info-dot"></span>Classifica live · T1+T2+T3+Gironi+S16</div>
   <table class="rank-table">
     <thead><tr>
@@ -477,6 +478,7 @@ function buildRanking() {
 
 // ---- RENDER ----
 function renderAll() {
+  renderWinnerCard();
   renderRanking();
   renderInputs();
   renderSchedine();
@@ -632,6 +634,36 @@ function renderStats() {
 
 function compRank(sorted, tot) {
   return sorted.filter(s => s.tot > tot).length + 1;
+}
+
+function renderWinnerCard() {
+  const el = document.getElementById('winner-card');
+  if (!el) return;
+  const sorted = buildRanking();
+  if (!sorted.length) { el.innerHTML = ''; return; }
+  const w = sorted[0];
+  const tied = sorted.filter(r => r.tot === w.tot);
+  const isTied = tied.length > 1;
+  el.innerHTML = `
+  <div class="winner-card">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-body">
+      <div class="winner-label">${isTied ? 'In testa' : 'In testa'}</div>
+      <div class="winner-name">${isTied ? tied.map(r=>r.n).join(' · ') : w.n}</div>
+      <div class="winner-scores">
+        <div class="wscore-item"><span class="wscore-val">${w.t1}</span><span class="wscore-lbl">T1</span></div>
+        <div class="wscore-sep"></div>
+        <div class="wscore-item"><span class="wscore-val">${w.t2}</span><span class="wscore-lbl">T2</span></div>
+        <div class="wscore-sep"></div>
+        <div class="wscore-item"><span class="wscore-val">${w.t3}</span><span class="wscore-lbl">T3</span></div>
+        <div class="wscore-sep"></div>
+        <div class="wscore-item"><span class="wscore-val">${w.gir}</span><span class="wscore-lbl">Gir.</span></div>
+        <div class="wscore-sep"></div>
+        <div class="wscore-item"><span class="wscore-val">${w.t4}</span><span class="wscore-lbl">S16</span></div>
+      </div>
+    </div>
+    <div class="winner-total">${w.tot}<span class="winner-total-lbl">pt</span></div>
+  </div>`;
 }
 
 function renderRanking() {
