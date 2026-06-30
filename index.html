@@ -150,7 +150,7 @@ const STANDINGS = [[{"t":"Messico","pt":9,"pg":3,"v":3,"n":0,"s":0,"gf":6,"gs":0
 const SHOW_S4 = false;
 const S4 = [
   {n:"Alexrsb",p:["X","2","1","1","1","2","X","1","X","2","2","1","X"]},
-  {n:"Sabino",p:["X","2","1","1","1","1","1","1","1","1","2","1","X"]},
+  {n:"sabino",p:["X","2","1","1","1","1","1","1","1","1","2","1","X"]},
   {n:"Andrea Imela",p:["X","X","1","X","1","1","X","1","1","X","X","1","X"]},
   {n:"Kvarapocul",p:["X","2","1","1","1","X","1","1","X","X","2","1","X"]},
   {n:"Felton",p:["1","X","1","X","1","1","1","1","X","1","2","1","1"]},
@@ -172,16 +172,16 @@ const S4 = [
   {n:"Riccardo Coppola",p:["X","2","1","X","1","X","1","1","X","X","X","1","X"]},
   {n:"Daniele tappo",p:["X","2","1","1","1","X","1","1","X","1","X","1","1"]},
   {n:"enzo e bast",p:["1","2","1","1","1","1","X","1","X","1","2","1","X"]},
-  {n:"Christian Belt",p:["X","2","1","X","1","X","1","1","1","X","2","1","1"]},
+  {n:"Chris",p:["X","2","1","X","1","X","1","1","1","X","2","1","1"]},
   {n:"Lucio Pascale",p:["X","2","1","X","1","X","X","1","1","1","2","1","1"]},
   {n:"Renato Amatori",p:["X","2","1","X","1","X","1","1","1","X","2","1","X"]},
   {n:"Raffaele Migliuolo",p:["1","2","1","1","1","1","1","1","X","1","X","1","1"]},
   {n:"Alessio Dalt",p:["2","X","1","1","1","X","1","1","X","1","X","1","X"]},
-  {n:"Mariano Petrucci",p:["X","2","1","1","1","1","1","1","X","1","X","1","1"]},
+  {n:"Mariano petrucci",p:["X","2","1","1","1","1","1","1","X","1","X","1","1"]},
   {n:"Fabio Esposito",p:["2","2","1","X","1","1","1","1","X","X","2","1","X"]},
   {n:"SSC Catena",p:["X","2","1","1","1","X","1","1","X","X","2","1","X"]},
   {n:"Manicomio",p:["X","2","1","1","1","X","1","1","1","X","2","1","1"]},
-  {n:"Michele/Italo",p:["X","X","1","1","1","X","1","1","X","X","2","1","X"]},
+  {n:"Michele/italo",p:["X","X","1","1","1","X","1","1","X","X","2","1","X"]},
   {n:"Emanuele Lopa",p:["X","2","1","X","1","X","1","1","1","1","X","1","1"]},
   {n:"Riccardo Rota",p:["X","X","1","X","1","X","X","1","X","1","2","1","1"]},
   {n:"Salvatore zu",p:["X","2","1","1","1","X","X","1","1","1","X","1","1"]},
@@ -212,7 +212,7 @@ let MT4 = [
   "Colombia-Ghana",        // M87 04/07 Arrowhead Stadium Kansas City
 ];
 let R4 = ["X",null,null,null,null,null,null,null,null,null,null,null,null];
-const SC4 = [null,null,null,null,null,null,null,null,null,null,null,null,null];
+const SC4 = ["1-1 (2-3 rig.)",null,null,null,null,null,null,null,null,null,null,null,null];
 let DT4 = ["30/06 - 03","30/06 - 19","30/06 - 23","01/07 - 03","01/07 - 18","01/07 - 22","02/07 - 02","02/07 - 21","03/07 - 01","03/07 - 05","03/07 - 20","04/07 - 00","04/07 - 03"];
 
 
@@ -666,11 +666,10 @@ function renderInputs() {
   document.getElementById('input-t2').innerHTML = MT2.map((m,i) => matchRow(m,i,R2,SC2)).join('');
   document.getElementById('input-t3').innerHTML = MT3.map((m,i) => matchRow(m,i,R3,SC3)).join('');
   const matchRowT4 = (m, i) => {
-    const rawScore = SC4[i] ? (SC4[i].match(/\d+-\d+/)||[''])[0] : '';
     const res = R4[i];
     const tagCls = res==='1'?'tag-1':res==='X'?'tag-X':res==='2'?'tag-2':'';
     const tag = res ? `<span class="tag ${tagCls}">${res}</span>` : '';
-    const score = rawScore ? `<div class="s16-score">${rawScore}</div>` : '';
+    const score = SC4[i] ? `<div class="s16-score">${SC4[i]}</div>` : '';
     const dt = DT4[i];
     const dateStr = dt ? `<div class="s16-dt">${dt}</div>` : '';
     const dashIdx = m.indexOf('-');
