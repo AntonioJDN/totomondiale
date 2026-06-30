@@ -45,12 +45,12 @@
 
 <!-- CLASSIFICA -->
 <div id="tab-classifica" class="tab-content active">
-  <div class="info-bar"><span class="info-dot"></span>Classifica live · T1+T2+T3+Gironi</div>
+  <div class="info-bar"><span class="info-dot"></span>Classifica live · T1+T2+T3+Gironi+S16</div>
   <table class="rank-table">
     <thead><tr>
       <th style="width:36px">#</th><th>Nome</th>
       <th title="Turno 1">T1</th><th title="Turno 2">T2</th><th title="Turno 3">T3</th>
-      <th title="Gironi">Gir.</th><th>Totale</th>
+      <th title="Gironi">Gir.</th><th title="Sedicesimi">S16</th><th>Totale</th>
     </tr></thead>
     <tbody id="rank-body"></tbody>
   </table>
@@ -459,7 +459,7 @@ function buildRanking() {
   const p1 = calcPts12(S1, R1);
   const p2 = calcPts12(S2, R2);
   const p3 = calcPts12(S3, R3);
-  const p4 = SHOW_S4 ? calcPts12(S4, R4) : {};
+  const p4 = calcPts12(S4, R4);
   const all = {};
   allNames().forEach(n => {
     all[n] = {
@@ -648,6 +648,7 @@ function renderRanking() {
       <td class="sub-pts">${r.t2}</td>
       <td class="sub-pts">${r.t3}</td>
       <td class="sub-pts" style="color:var(--gold)">${r.gir}</td>
+      <td class="sub-pts" style="color:var(--accent)">${r.t4}</td>
       <td class="pts-cell">${r.tot}</td>
     </tr>`;
   }).join('');
